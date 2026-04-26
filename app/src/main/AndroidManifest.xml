@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Salud_App">
 
-        <!-- Splash Activity como punto de entrada principal -->
+        <!-- Splash: punto de entrada -->
         <activity
             android:name="pa.ac.utp.salud_app.Splash"
             android:exported="true"
@@ -24,14 +24,39 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity -->
+        <!-- Menú principal -->
         <activity
             android:name="pa.ac.utp.salud_app.MainActivity"
             android:exported="false" />
 
-        <!-- Calcular Activity -->
+        <!-- Calcular (existente) -->
         <activity
             android:name="pa.ac.utp.salud_app.Calcular"
+            android:exported="false" />
+
+        <!-- Módulos -->
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloPeso"
+            android:exported="false" />
+
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloPresion"
+            android:exported="false" />
+
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloGlucosa"
+            android:exported="false" />
+
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloAgua"
+            android:exported="false" />
+
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloMedicina"
+            android:exported="false" />
+
+        <activity
+            android:name="pa.ac.utp.salud_app.ModuloActividad"
             android:exported="false" />
 
     </application>
