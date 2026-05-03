@@ -40,30 +40,61 @@ class ModuloPeso : AppCompatActivity() {
         // --- Botón Calcular ---
         btnCalcular.setOnClickListener { view ->
 
+            fun error(msg: String) {
+                Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(getColor(android.R.color.holo_red_dark))
+                    .setTextColor(getColor(android.R.color.white))
+                    .show()
+            }
+
             val sEdad     = etEdad.text.toString()
             val sPeso     = etPeso.text.toString()
             val sEstatura = etEstatura.text.toString()
 
             // Validación: campos vacíos
             if (sEdad.isEmpty() || sPeso.isEmpty() || sEstatura.isEmpty()) {
-                Snackbar.make(view, "Completa todos los campos", Snackbar.LENGTH_SHORT)
-                    .setBackgroundTint(getColor(android.R.color.holo_red_dark))
-                    .setTextColor(getColor(android.R.color.white))
-                    .show()
+                error("Completa todos los campos")
                 return@setOnClickListener
             }
 
-            val edad     = sEdad.toInt()
-            var peso     = sPeso.toDouble()
-            var estatura = sEstatura.toDouble()
+            val edad: Int
+            val peso: Double
+            val estatura: Double
+            try {
+                edad     = sEdad.toInt()
+                peso     = sPeso.toDouble()
+                estatura = sEstatura.toDouble()
+            } catch (e: NumberFormatException) {
+                error("Valores numéricos inválidos")
+                return@setOnClickListener
+            }
+
+            // Validación de rangos según unidad seleccionada
+            if (edad < 1 || edad > 120) {
+                error("Edad inválida (1 – 120 años)")
+                return@setOnClickListener
+            }
+            if (swPeso.isChecked) {
+                if (peso < 22.0 || peso > 661.0) { error("Peso inválido (22 – 661 lb)"); return@setOnClickListener }
+            } else {
+                if (peso < 10.0 || peso > 300.0) { error("Peso inválido (10 – 300 kg)"); return@setOnClickListener }
+            }
+            if (swEstatura.isChecked) {
+                if (estatura < 20.0 || estatura > 99.0) { error("Estatura inválida (20 – 99 in)"); return@setOnClickListener }
+            } else {
+                if (estatura < 50.0 || estatura > 250.0) { error("Estatura inválida (50 – 250 cm)"); return@setOnClickListener }
+            }
+
+            var pesoKg     = peso
+            var estatCm    = estatura
 
             // Normalización de unidades
-            if (swPeso.isChecked)     peso     *= 0.453592   // lb → kg
-            if (swEstatura.isChecked) estatura *= 2.54        // in → cm
+            if (swPeso.isChecked)     pesoKg  *= 0.453592   // lb → kg
+            if (swEstatura.isChecked) estatCm *= 2.54        // in → cm
 
             // Cálculos
-            val estaturaMetros = estatura / 100.0
-            val imc       = peso / (estaturaMetros * estaturaMetros)
+            val estaturaMetros = estatCm / 100.0
+            val imc       = pesoKg / (estaturaMetros * estaturaMetros)
             val pesoIdeal = 22.0 * (estaturaMetros * estaturaMetros)
             val grasa     = (1.20 * imc) + (0.23 * edad) - 16.2
 

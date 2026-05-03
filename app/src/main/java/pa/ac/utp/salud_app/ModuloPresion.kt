@@ -1,11 +1,148 @@
 package pa.ac.utp.salud_app
 
+import android.app.DatePickerDialog
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import java.util.Calendar
 
 class ModuloPresion : AppCompatActivity() {
+
+    private lateinit var btnFecha: Button
+    private lateinit var txtFecha: TextView
+    private lateinit var tvHora: TextView
+    private lateinit var timePicker: TimePicker
+    private lateinit var npSistolica: NumberPicker
+    private lateinit var npDiastolica: NumberPicker
+    private lateinit var npPulso: NumberPicker
+    private lateinit var rgBrazo: RadioGroup
+    private lateinit var btnAnalizar: Button
+    private lateinit var cardResultado: CardView
+    private lateinit var txtResultado: TextView
+    private lateinit var tvClasificacion: TextView
+    private lateinit var tvConsejo: TextView
+
+    private var fechaSeleccionada: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_presion)
+
+        btnFecha       = findViewById(R.id.btnFecha)
+        txtFecha       = findViewById(R.id.txtFecha)
+        tvHora         = findViewById(R.id.tvHora)
+        timePicker     = findViewById(R.id.timePicker)
+        npSistolica    = findViewById(R.id.npSistolica)
+        npDiastolica   = findViewById(R.id.npDiastolica)
+        npPulso        = findViewById(R.id.npPulso)
+        rgBrazo        = findViewById(R.id.rgBrazo)
+        btnAnalizar    = findViewById(R.id.btnAnalizar)
+        cardResultado  = findViewById(R.id.cardResultado)
+        txtResultado   = findViewById(R.id.txtResultado)
+        tvClasificacion = findViewById(R.id.tvClasificacion)
+        tvConsejo      = findViewById(R.id.tvConsejo)
+
+        // Configuración TimePicker
+        timePicker.setIs24HourView(true)
+        timePicker.setOnTimeChangedListener { _, hour, minute ->
+            tvHora.text = String.format("%02d:%02d", hour, minute)
+        }
+
+        // Hora inicial en tvHora
+        val calNow = Calendar.getInstance()
+        tvHora.text = String.format(
+            "%02d:%02d",
+            calNow.get(Calendar.HOUR_OF_DAY),
+            calNow.get(Calendar.MINUTE)
+        )
+
+        // Rangos NumberPicker (clínicamente razonables)
+        npSistolica.minValue  = 80;  npSistolica.maxValue  = 200; npSistolica.value  = 120
+        npDiastolica.minValue = 40;  npDiastolica.maxValue = 130; npDiastolica.value =  80
+        npPulso.minValue      = 40;  npPulso.maxValue      = 180; npPulso.value      =  72
+
+        btnFecha.setOnClickListener   { mostrarDatePicker() }
+        btnAnalizar.setOnClickListener { analizarMedicion() }
+    }
+
+    private fun mostrarDatePicker() {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                fechaSeleccionada = "$day/${month + 1}/$year"
+                txtFecha.text     = "Fecha: $fechaSeleccionada"
+                btnFecha.text     = "Seleccionar Fecha:\n$fechaSeleccionada"
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    private fun analizarMedicion() {
+        if (fechaSeleccionada == null) {
+            Toast.makeText(this, "Debe seleccionar una fecha", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (rgBrazo.checkedRadioButtonId == -1) {
+            Toast.makeText(this, "Debe seleccionar el brazo de medición", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val sistolica  = npSistolica.value
+        val diastolica = npDiastolica.value
+        val pulso      = npPulso.value
+        val hora       = String.format("%02d:%02d", timePicker.hour, timePicker.minute)
+        val brazo      = findViewById<RadioButton>(rgBrazo.checkedRadioButtonId).text
+
+        val clasificacion = clasificarPresion(sistolica, diastolica)
+
+        txtResultado.text = """
+            Fecha: $fechaSeleccionada
+            Hora: $hora
+            Sistólica: $sistolica mmHg         Pulso: $pulso BPM
+            Diastólica: $diastolica mmHg        Brazo: $brazo
+        """.trimIndent()
+
+        tvClasificacion.text = clasificacion.uppercase()
+        tvClasificacion.setTextColor(Color.WHITE)
+        aplicarBadge(tvClasificacion, colorClasificacion(clasificacion))
+
+        tvConsejo.text = consejoPresion(clasificacion)
+        cardResultado.visibility = View.VISIBLE
+    }
+
+    private fun aplicarBadge(view: TextView, color: Int) {
+        val bg = GradientDrawable()
+        bg.shape = GradientDrawable.RECTANGLE
+        bg.cornerRadius = 10f * resources.displayMetrics.density
+        bg.setColor(color)
+        view.background = bg
+    }
+
+    private fun clasificarPresion(sistolica: Int, diastolica: Int): String = when {
+        sistolica < 90 || diastolica < 60                         -> "Presión baja"
+        sistolica in 90..119 && diastolica in 60..79              -> "Presión normal"
+        sistolica in 120..129 && diastolica < 80                  -> "Presión elevada"
+        else                                                       -> "Hipertensión"
+    }
+
+    private fun colorClasificacion(clasificacion: String): Int = when (clasificacion) {
+        "Presión baja"    -> Color.parseColor("#2196F3")
+        "Presión normal"  -> Color.parseColor("#4CAF50")
+        "Presión elevada" -> Color.parseColor("#FF9800")
+        else              -> Color.parseColor("#F44336")
+    }
+
+    private fun consejoPresion(clasificacion: String): String = when (clasificacion) {
+        "Presión baja"    -> "ⓘ  Manténgase hidratado y evite cambios bruscos de posición."
+        "Presión normal"  -> "ⓘ  Su presión está en un rango saludable. Mantenga un estilo de vida activo."
+        "Presión elevada" -> "ⓘ  Reduzca el consumo de sal y realice actividad física moderada."
+        else              -> "ⓘ  Consulte a un médico. Evite el estrés y siga las indicaciones médicas."
     }
 }
