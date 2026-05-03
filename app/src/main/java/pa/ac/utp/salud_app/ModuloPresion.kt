@@ -1,6 +1,5 @@
 package pa.ac.utp.salud_app
 
-import android.app.DatePickerDialog
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -8,7 +7,9 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import java.util.Calendar
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ModuloPresion : AppCompatActivity() {
 
@@ -65,23 +66,29 @@ class ModuloPresion : AppCompatActivity() {
         npDiastolica.minValue = 40;  npDiastolica.maxValue = 130; npDiastolica.value =  80
         npPulso.minValue      = 40;  npPulso.maxValue      = 180; npPulso.value      =  72
 
+        // Sin ciclo infinito: el picker no regresa al inicio al llegar al extremo
+        npSistolica.wrapSelectorWheel  = false
+        npDiastolica.wrapSelectorWheel = false
+        npPulso.wrapSelectorWheel      = false
+
         btnFecha.setOnClickListener   { mostrarDatePicker() }
         btnAnalizar.setOnClickListener { analizarMedicion() }
     }
 
     private fun mostrarDatePicker() {
-        val cal = Calendar.getInstance()
-        DatePickerDialog(
-            this,
-            { _, year, month, day ->
-                fechaSeleccionada = "$day/${month + 1}/$year"
-                txtFecha.text     = "Fecha: $fechaSeleccionada"
-                btnFecha.text     = "Seleccionar Fecha:\n$fechaSeleccionada"
-            },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Seleccionar fecha de medición")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        picker.addOnPositiveButtonClickListener { seleccion ->
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            fechaSeleccionada = sdf.format(Date(seleccion))
+            txtFecha.text = "Fecha: $fechaSeleccionada"
+            btnFecha.text = "Fecha: $fechaSeleccionada"
+        }
+
+        picker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
     }
 
     private fun analizarMedicion() {
