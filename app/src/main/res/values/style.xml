@@ -33,4 +33,11 @@
         <item name="android:textColor">#757575</item>
         <item name="android:textSize">11sp</item>
     </style>
+
+    <!-- Fuerza texto oscuro en el TimePicker spinner para que sea legible sobre fondo blanco -->
+    <style name="TimePickerSpinnerTheme">
+        <item name="android:textColorPrimary">#1A2D4A</item>
+        <item name="android:textColorSecondary">#5E7A9D</item>
+        <item name="colorControlNormal">#1A4375</item>
+    </style>
 </resources>
