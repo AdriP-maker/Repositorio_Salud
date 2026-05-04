@@ -120,6 +120,19 @@ class ModuloPresion : AppCompatActivity() {
 
         val clasificacion = clasificarPresion(sistolica, diastolica)
 
+        val badgeColor = when (clasificacion) {
+            "Presión baja"    -> Color.parseColor("#2196F3")
+            "Presión normal"  -> Color.parseColor("#4CAF50")
+            "Presión elevada" -> Color.parseColor("#FF9800")
+            else              -> Color.parseColor("#F44336")
+        }
+        val consejo = when (clasificacion) {
+            "Presión baja"    -> "ⓘ  Manténgase hidratado y evite cambios bruscos de posición."
+            "Presión normal"  -> "ⓘ  Su presión está en un rango saludable. Mantenga un estilo de vida activo."
+            "Presión elevada" -> "ⓘ  Reduzca el consumo de sal y realice actividad física moderada."
+            else              -> "ⓘ  Consulte a un médico. Evite el estrés y siga las indicaciones médicas."
+        }
+
         txtResultado.text = """
             Fecha: $fechaSeleccionada
             Hora: $hora
@@ -127,34 +140,23 @@ class ModuloPresion : AppCompatActivity() {
             Diastólica: $diastolica mmHg        Brazo: $brazo
         """.trimIndent()
 
-        tvClasificacion.text = clasificacion.uppercase()
+        val bg = GradientDrawable().apply {
+            shape        = GradientDrawable.RECTANGLE
+            cornerRadius = 10f * resources.displayMetrics.density
+            setColor(badgeColor)
+        }
+        tvClasificacion.text       = clasificacion.uppercase()
         tvClasificacion.setTextColor(Color.WHITE)
-        aplicarBadge(tvClasificacion, colorClasificacion(clasificacion))
-
-        tvConsejo.text = consejoPresion(clasificacion)
-        cardResultado.visibility = View.VISIBLE
-    }
-
-    private fun aplicarBadge(view: TextView, color: Int) {
-        val bg = GradientDrawable()
-        bg.shape = GradientDrawable.RECTANGLE
-        bg.cornerRadius = 10f * resources.displayMetrics.density
-        bg.setColor(color)
-        view.background = bg
+        tvClasificacion.background = bg
+        tvConsejo.text             = consejo
+        cardResultado.visibility   = View.VISIBLE
     }
 
     private fun clasificarPresion(sistolica: Int, diastolica: Int): String = when {
-        sistolica < 90 || diastolica < 60                         -> "Presión baja"
-        sistolica in 90..119 && diastolica in 60..79              -> "Presión normal"
-        sistolica in 120..129 && diastolica < 80                  -> "Presión elevada"
-        else                                                       -> "Hipertensión"
-    }
-
-    private fun colorClasificacion(clasificacion: String): Int = when (clasificacion) {
-        "Presión baja"    -> Color.parseColor("#2196F3")
-        "Presión normal"  -> Color.parseColor("#4CAF50")
-        "Presión elevada" -> Color.parseColor("#FF9800")
-        else              -> Color.parseColor("#F44336")
+        sistolica < 90 || diastolica < 60                    -> "Presión baja"
+        sistolica in 90..119 && diastolica in 60..79         -> "Presión normal"
+        sistolica in 120..129 && diastolica < 80             -> "Presión elevada"
+        else                                                  -> "Hipertensión"
     }
 
     /** Reflection: fuerza color texto oscuro en NumberPicker (no hay API pública hasta API 29). */
@@ -180,10 +182,4 @@ class ModuloPresion : AppCompatActivity() {
         return String.format("%02d:%02d %s", h12, minute, amPm)
     }
 
-    private fun consejoPresion(clasificacion: String): String = when (clasificacion) {
-        "Presión baja"    -> "ⓘ  Manténgase hidratado y evite cambios bruscos de posición."
-        "Presión normal"  -> "ⓘ  Su presión está en un rango saludable. Mantenga un estilo de vida activo."
-        "Presión elevada" -> "ⓘ  Reduzca el consumo de sal y realice actividad física moderada."
-        else              -> "ⓘ  Consulte a un médico. Evite el estrés y siga las indicaciones médicas."
-    }
 }
