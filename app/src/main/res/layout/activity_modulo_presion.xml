@@ -11,11 +11,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Encabezado morado -->
+        <!-- Encabezado azul -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#7B1FA2"
+            android:background="#1A4375"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:padding="16dp">
@@ -82,7 +82,7 @@
                             android:layout_weight="1"
                             android:text="Seleccionar Fecha"
                             android:textSize="13sp"
-                            android:backgroundTint="#7B1FA2"
+                            android:backgroundTint="#1A4375"
                             android:textColor="#FFFFFF"
                             app:cornerRadius="8dp"
                             android:layout_marginEnd="12dp" />
@@ -154,7 +154,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="16dp"
+                        android:baselineAligned="false">
 
                         <!-- Sistólica -->
                         <LinearLayout
@@ -162,7 +163,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="4dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -177,12 +179,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="(mmHg)"
                                 android:textColor="#5E7A9D"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:layout_marginBottom="4dp" />
 
                             <NumberPicker
                                 android:id="@+id/npSistolica"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:scaleX="1.1"
+                                android:scaleY="1.1" />
                         </LinearLayout>
 
                         <!-- Diastólica -->
@@ -191,7 +196,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="4dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -206,12 +212,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="(mmHg)"
                                 android:textColor="#5E7A9D"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:layout_marginBottom="4dp" />
 
                             <NumberPicker
                                 android:id="@+id/npDiastolica"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:scaleX="1.1"
+                                android:scaleY="1.1" />
                         </LinearLayout>
 
                         <!-- Pulso -->
@@ -220,7 +229,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="4dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -235,12 +245,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="(BPM)"
                                 android:textColor="#5E7A9D"
-                                android:textSize="10sp" />
+                                android:textSize="10sp"
+                                android:layout_marginBottom="4dp" />
 
                             <NumberPicker
                                 android:id="@+id/npPulso"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:scaleX="1.1"
+                                android:scaleY="1.1" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -275,7 +288,7 @@
                             android:layout_weight="1"
                             android:text="Brazo Izquierdo"
                             android:textColor="#1A2D4A"
-                            android:buttonTint="#7B1FA2" />
+                            android:buttonTint="#1A4375" />
 
                         <RadioButton
                             android:id="@+id/rbDerecho"
@@ -284,7 +297,7 @@
                             android:layout_weight="1"
                             android:text="Brazo Derecho"
                             android:textColor="#1A2D4A"
-                            android:buttonTint="#7B1FA2" />
+                            android:buttonTint="#1A4375" />
                     </RadioGroup>
 
                 </LinearLayout>
@@ -298,7 +311,7 @@
                 android:text="ANALIZAR MEDICIÓN"
                 android:textStyle="bold"
                 android:textSize="15sp"
-                android:backgroundTint="#7B1FA2"
+                android:backgroundTint="#1A4375"
                 android:textColor="#FFFFFF"
                 app:cornerRadius="12dp"
                 android:layout_marginBottom="16dp" />
