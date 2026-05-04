@@ -287,18 +287,20 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:buttonTint="#1A4375"
                             android:text="Brazo Izquierdo"
                             android:textColor="#1A2D4A"
-                            android:buttonTint="#1A4375" />
+                            android:textColorLink="#2196F3" />
 
                         <RadioButton
                             android:id="@+id/rbDerecho"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:buttonTint="#1A4375"
                             android:text="Brazo Derecho"
                             android:textColor="#1A2D4A"
-                            android:buttonTint="#1A4375" />
+                            android:textColorLink="#2196F3" />
                     </RadioGroup>
 
                 </LinearLayout>
