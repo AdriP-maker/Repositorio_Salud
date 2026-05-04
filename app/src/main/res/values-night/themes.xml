@@ -1,7 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Salud_App" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">#4E8FD4</item>
+        <item name="colorOnPrimary">#002D5C</item>
+        <item name="colorPrimaryContainer">#1A4375</item>
+        <item name="colorOnPrimaryContainer">#D0E4FF</item>
     </style>
 </resources>
