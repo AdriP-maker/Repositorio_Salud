@@ -2,8 +2,8 @@ package pa.ac.utp.salud_app
 
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -159,20 +159,18 @@ class ModuloPresion : AppCompatActivity() {
         else                                                  -> "Hipertensión"
     }
 
-    /** Reflection: fuerza color texto oscuro en NumberPicker (no hay API pública hasta API 29). */
+    /** API 29+: setTextColor() público. API 24-28: reflection sobre mSelectorWheelPaint. */
     private fun NumberPicker.forzarColorTexto() {
         val textColor = Color.parseColor("#1A2D4A")
-        val divColor  = Color.parseColor("#1A4375")
-        try {
-            val paintField = NumberPicker::class.java.getDeclaredField("mSelectorWheelPaint")
-            paintField.isAccessible = true
-            (paintField.get(this) as Paint).color = textColor
-        } catch (_: Exception) {}
-        try {
-            val divField = NumberPicker::class.java.getDeclaredField("mSelectionDivider")
-            divField.isAccessible = true
-            divField.set(this, ColorDrawable(divColor))
-        } catch (_: Exception) {}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setTextColor(textColor)
+        } else {
+            try {
+                val field = NumberPicker::class.java.getDeclaredField("mSelectorWheelPaint")
+                field.isAccessible = true
+                (field.get(this) as Paint).color = textColor
+            } catch (_: Exception) {}
+        }
         invalidate()
     }
 
