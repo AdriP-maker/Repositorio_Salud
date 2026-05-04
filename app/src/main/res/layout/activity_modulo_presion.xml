@@ -105,7 +105,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="(24h)"
+                                android:text="(AM/PM)"
                                 android:textColor="#5E7A9D"
                                 android:textSize="11sp" />
                         </LinearLayout>
@@ -130,14 +130,15 @@
                         android:textSize="13sp"
                         android:layout_marginBottom="4dp" />
 
-                    <!-- TimePicker en modo spinner -->
+                    <!-- TimePicker en modo spinner, 12h, colores oscuros para legibilidad -->
                     <TimePicker
                         android:id="@+id/timePicker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:timePickerMode="spinner"
                         android:layout_gravity="center"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        android:theme="@style/TimePickerSpinnerTheme" />
 
                     <!-- Etiqueta valores -->
                     <TextView

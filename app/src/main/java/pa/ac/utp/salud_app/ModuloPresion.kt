@@ -47,16 +47,15 @@ class ModuloPresion : AppCompatActivity() {
         tvClasificacion = findViewById(R.id.tvClasificacion)
         tvConsejo      = findViewById(R.id.tvConsejo)
 
-        // Configuración TimePicker
-        timePicker.setIs24HourView(true)
+        // Configuración TimePicker en formato 12h
+        timePicker.setIs24HourView(false)
         timePicker.setOnTimeChangedListener { _, hour, minute ->
-            tvHora.text = String.format("%02d:%02d", hour, minute)
+            tvHora.text = formatearHora12(hour, minute)
         }
 
         // Hora inicial en tvHora
         val calNow = Calendar.getInstance()
-        tvHora.text = String.format(
-            "%02d:%02d",
+        tvHora.text = formatearHora12(
             calNow.get(Calendar.HOUR_OF_DAY),
             calNow.get(Calendar.MINUTE)
         )
@@ -104,7 +103,7 @@ class ModuloPresion : AppCompatActivity() {
         val sistolica  = npSistolica.value
         val diastolica = npDiastolica.value
         val pulso      = npPulso.value
-        val hora       = String.format("%02d:%02d", timePicker.hour, timePicker.minute)
+        val hora       = formatearHora12(timePicker.hour, timePicker.minute)
         val brazo      = findViewById<RadioButton>(rgBrazo.checkedRadioButtonId).text
 
         val clasificacion = clasificarPresion(sistolica, diastolica)
@@ -144,6 +143,12 @@ class ModuloPresion : AppCompatActivity() {
         "Presión normal"  -> Color.parseColor("#4CAF50")
         "Presión elevada" -> Color.parseColor("#FF9800")
         else              -> Color.parseColor("#F44336")
+    }
+
+    private fun formatearHora12(hour: Int, minute: Int): String {
+        val h12  = when { hour == 0 -> 12; hour > 12 -> hour - 12; else -> hour }
+        val amPm = if (hour < 12) "AM" else "PM"
+        return String.format("%02d:%02d %s", h12, minute, amPm)
     }
 
     private fun consejoPresion(clasificacion: String): String = when (clasificacion) {
