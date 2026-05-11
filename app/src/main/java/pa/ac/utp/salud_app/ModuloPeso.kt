@@ -8,6 +8,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.snackbar.Snackbar
+import org.json.JSONArray
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ModuloPeso : AppCompatActivity() {
 
@@ -109,7 +114,22 @@ class ModuloPeso : AppCompatActivity() {
             tvPesoIdeal.text    = String.format("%.1f kg", pesoIdeal)
             tvGrasa.text        = String.format("%.1f%%", grasa)
             tvClasificacion.text = categorizarIMC(imc)
+
+            guardarRegistro(pesoKg, imc)
         }
+    }
+
+    private fun guardarRegistro(pesoKg: Double, imc: Double) {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_peso", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+        val registro = JSONObject().apply {
+            put("fecha", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()))
+            put("peso", pesoKg)
+            put("imc", imc)
+        }
+        array.put(registro)
+        prefs.edit().putString("historial_peso", array.toString()).apply()
     }
 
     private fun categorizarIMC(imc: Double): String {
