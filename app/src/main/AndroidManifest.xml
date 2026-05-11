@@ -40,6 +40,10 @@
             android:exported="false" />
 
         <activity
+            android:name="pa.ac.utp.salud_app.HistorialPesoActivity"
+            android:exported="false" />
+
+        <activity
             android:name="pa.ac.utp.salud_app.ModuloPresion"
             android:exported="false" />
 

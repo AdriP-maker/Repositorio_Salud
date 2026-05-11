@@ -252,5 +252,17 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Botón Ver Historial -->
+        <Button
+            android:id="@+id/btnVerHistorial"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="VER HISTORIAL"
+            android:textStyle="bold"
+            android:backgroundTint="#5E7A9D"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp"
+            android:layout_marginTop="16dp" />
+
     </LinearLayout>
 </ScrollView>

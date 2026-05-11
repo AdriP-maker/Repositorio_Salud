@@ -1,5 +1,6 @@
 package pa.ac.utp.salud_app
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -20,7 +21,12 @@ class ModuloPeso : AppCompatActivity() {
         val etEstatura     = findViewById<EditText>(R.id.etEstatura)
         val swPeso         = findViewById<SwitchCompat>(R.id.swPesoUnit)
         val swEstatura     = findViewById<SwitchCompat>(R.id.swEstaturaUnit)
-        val btnCalcular    = findViewById<Button>(R.id.btnCalcular)
+        val btnCalcular      = findViewById<Button>(R.id.btnCalcular)
+        val btnVerHistorial  = findViewById<Button>(R.id.btnVerHistorial)
+
+        btnVerHistorial.setOnClickListener {
+            startActivity(Intent(this, HistorialPesoActivity::class.java))
+        }
         val tvIMC          = findViewById<TextView>(R.id.tvIMC)
         val tvPesoIdeal    = findViewById<TextView>(R.id.tvPesoIdeal)
         val tvGrasa        = findViewById<TextView>(R.id.tvGrasa)
