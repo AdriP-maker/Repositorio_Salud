@@ -99,28 +99,28 @@ class ModuloGlucosa : AppCompatActivity() {
         val notas           = etNotas.text.toString().trim()
 
         if (valorGlucosaStr.isEmpty()) {
-            Toast.makeText(this, "Ingrese un valor de glucosa", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.enter_glucose_error), Toast.LENGTH_SHORT).show()
             return
         }
 
         val valorGlucosa = valorGlucosaStr.toDoubleOrNull()
         if (valorGlucosa == null || valorGlucosa <= 0 || valorGlucosa > 600) {
-            Toast.makeText(this, "Ingrese un valor de glucosa válido (entre 1 y 600)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.invalid_glucose_error), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (tipoSeleccionado.isEmpty()) {
-            Toast.makeText(this, "Seleccione el tipo de registro", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.select_type_error), Toast.LENGTH_SHORT).show()
             return
         }
 
-        val notasTexto = notas.ifEmpty { "Sin notas" }
+        val notasTexto = notas.ifEmpty { getString(R.string.no_notes) }
         val horaActual = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         
-        // Actualizar el resumen previo en la UI
-        tvResumenPrevio.text = "Última lectura: $valorGlucosa mg/dL\n($tipoSeleccionado; $horaActual)"
+        // Actualizar el resumen previo en la UI usando un recurso con formato
+        tvResumenPrevio.text = getString(R.string.previous_summary_format, valorGlucosa, getString(R.string.mg_dl), tipoSeleccionado, horaActual)
 
-        val mensaje    = "Registro guardado:\n$valorGlucosa mg/dL\nTipo: $tipoSeleccionado\nNotas: $notasTexto"
+        val mensaje = getString(R.string.record_saved_msg, valorGlucosa, getString(R.string.mg_dl), tipoSeleccionado, notasTexto)
         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
 
         // Limpiar campos después de guardar

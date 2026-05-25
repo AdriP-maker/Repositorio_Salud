@@ -18,6 +18,12 @@
     <string name="add_notes_hint">Añadir notas&#8230;</string>
     <string name="previous_summary_label">RESUMEN PREVIO</string>
     <string name="no_previous_records">No hay registros previos</string>
+    <string name="previous_summary_format">Última lectura: %1$.1f %2$s\n(%3$s; %4$s)</string>
     <string name="save_record_btn">+ GUARDAR REGISTRO</string>
     <string name="icon_description">Icono de glucosa</string>
+    <string name="select_type_error">Seleccione el tipo de registro</string>
+    <string name="enter_glucose_error">Ingrese un valor de glucosa</string>
+    <string name="invalid_glucose_error">Ingrese un valor de glucosa válido (entre 1 y 600)</string>
+    <string name="record_saved_msg">Registro guardado:\n%1$.1f %2$s\nTipo: %3$s\nNotas: %4$s</string>
+    <string name="no_notes">Sin notas</string>
 </resources>
