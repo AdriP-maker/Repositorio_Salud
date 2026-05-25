@@ -59,12 +59,17 @@ class ModuloGlucosa : AppCompatActivity() {
 
     private fun actualizarFechaHora() {
         val cal    = Calendar.getInstance()
-        val locale = Locale("es", "PA")
+        val locale = Locale.forLanguageTag("es-PA")
         val dia    = SimpleDateFormat("EEEE", locale).format(cal.time)
             .replaceFirstChar { it.uppercase() }
         val fecha  = SimpleDateFormat("d 'de' MMMM", locale).format(cal.time)
         val hora   = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(cal.time)
-        tvFechaHoraRegistro.text = "REGISTRO: Hoy - $dia, $fecha | $hora"
+        
+        val recordText = getString(R.string.record_today_loading)
+            .replace("Cargando&#8230;", "$dia, $fecha | $hora")
+            .replace("Cargando...", "$dia, $fecha | $hora")
+            
+        tvFechaHoraRegistro.text = recordText
     }
 
     private fun seleccionarTipo(rowSeleccionada: LinearLayout, tipo: String) {
@@ -86,7 +91,7 @@ class ModuloGlucosa : AppCompatActivity() {
     private fun toggleNotas() {
         notasExpandidas     = !notasExpandidas
         etNotas.visibility  = if (notasExpandidas) View.VISIBLE else View.GONE
-        tvArrowNotas.text   = if (notasExpandidas) "∧" else "∨"
+        tvArrowNotas.text   = if (notasExpandidas) getString(R.string.arrow_up) else getString(R.string.arrow_down)
     }
 
     private fun guardarRegistro() {

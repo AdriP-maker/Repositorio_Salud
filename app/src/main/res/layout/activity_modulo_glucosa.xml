@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0F4F8"
@@ -24,13 +25,14 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_glucosa" />
+                app:srcCompat="@drawable/ic_glucosa"
+                android:contentDescription="@string/icon_description" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="AÑADIR NUEVO REGISTRO"
+                android:text="@string/add_new_record"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -52,7 +54,7 @@
                 android:background="#FFFFFF"
                 android:elevation="2dp"
                 android:padding="10dp"
-                android:text="REGISTRO: Hoy - Cargando..."
+                android:text="@string/record_today_loading"
                 android:textColor="#1A2D4A"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -86,7 +88,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="14dp"
                             android:gravity="center"
-                            android:text="VALOR DE GLUCOSA"
+                            android:text="@string/glucose_value_label"
                             android:textColor="#1A2D4A"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -97,13 +99,14 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:gravity="center"
-                            android:hint="- - -"
+                            android:hint="@string/glucose_hint"
                             android:inputType="numberDecimal"
                             android:paddingBottom="4dp"
                             android:textColor="#1A2D4A"
                             android:textColorHint="#B0BEC5"
                             android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:importantForAutofill="no" />
 
                         <View
                             android:layout_width="match_parent"
@@ -114,7 +117,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="mg/dL"
+                            android:text="@string/mg_dl"
                             android:textColor="#1A2D4A"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -123,7 +126,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Ingresar Valor"
+                            android:text="@string/enter_value"
                             android:textColor="#90A4AE"
                             android:textSize="11sp" />
 
@@ -150,7 +153,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="10dp"
-                            android:text="TIPO DE REGISTRO"
+                            android:text="@string/record_type_label"
                             android:textColor="#1A2D4A"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -167,19 +170,21 @@
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="7dp">
+                            android:padding="7dp"
+                            tools:ignore="KeyboardInaccessibleStock">
 
                             <ImageView
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="8dp"
                                 android:scaleType="fitCenter"
-                                app:srcCompat="@mipmap/ayuno_round" />
+                                app:srcCompat="@mipmap/ayuno_round"
+                                android:contentDescription="@null" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Ayunas"
+                                android:text="@string/fasting"
                                 android:textColor="#1A2D4A"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -196,19 +201,21 @@
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="7dp">
+                            android:padding="7dp"
+                            tools:ignore="KeyboardInaccessibleStock">
 
                             <ImageView
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="8dp"
                                 android:scaleType="fitCenter"
-                                app:srcCompat="@mipmap/horadecomer_round" />
+                                app:srcCompat="@mipmap/horadecomer_round"
+                                android:contentDescription="@null" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Antes de\nAlmuerzo"
+                                android:text="@string/before_lunch"
                                 android:textColor="#1A2D4A"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -225,19 +232,21 @@
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="7dp">
+                            android:padding="7dp"
+                            tools:ignore="KeyboardInaccessibleStock">
 
                             <ImageView
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="8dp"
                                 android:scaleType="fitCenter"
-                                app:srcCompat="@mipmap/cajadealmuerzo_round" />
+                                app:srcCompat="@mipmap/cajadealmuerzo_round"
+                                android:contentDescription="@null" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Después de\nAlmuerzo"
+                                android:text="@string/after_lunch"
                                 android:textColor="#1A2D4A"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -253,19 +262,21 @@
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="7dp">
+                            android:padding="7dp"
+                            tools:ignore="KeyboardInaccessibleStock">
 
                             <ImageView
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:layout_marginEnd="8dp"
                                 android:scaleType="fitCenter"
-                                app:srcCompat="@mipmap/cena_round" />
+                                app:srcCompat="@mipmap/cena_round"
+                                android:contentDescription="@null" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Cena"
+                                android:text="@string/dinner"
                                 android:textColor="#1A2D4A"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -304,7 +315,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="NOTAS OPCIONALES"
+                            android:text="@string/optional_notes"
                             android:textColor="#1A2D4A"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -313,7 +324,7 @@
                             android:id="@+id/tvArrowNotas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="∧"
+                            android:text="@string/arrow_up"
                             android:textColor="#1A4375"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -326,14 +337,15 @@
                         android:layout_marginTop="10dp"
                         android:background="@drawable/input_round"
                         android:gravity="top|start"
-                        android:hint="Añadir notas..."
+                        android:hint="@string/add_notes_hint"
                         android:inputType="textMultiLine"
                         android:minLines="3"
                         android:padding="10dp"
                         android:textColor="#1A2D4A"
                         android:textColorHint="#B0BEC5"
                         android:textSize="13sp"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        android:importantForAutofill="no" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -357,7 +369,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="6dp"
-                        android:text="RESUMEN PREVIO"
+                        android:text="@string/previous_summary_label"
                         android:textColor="#1A2D4A"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -373,7 +385,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:lineSpacingExtra="2dp"
-                        android:text="No hay registros previos"
+                        android:text="@string/no_previous_records"
                         android:textColor="#5E7A9D"
                         android:textSize="13sp" />
 
@@ -387,7 +399,7 @@
                 android:layout_height="55dp"
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="#2E7D32"
-                android:text="+ GUARDAR REGISTRO"
+                android:text="@string/save_record_btn"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"

@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Salud_App</string>
+    <string name="add_new_record">AÑADIR NUEVO REGISTRO</string>
+    <string name="record_today_loading">REGISTRO: Hoy - Cargando&#8230;</string>
+    <string name="glucose_value_label">VALOR DE GLUCOSA</string>
+    <string name="glucose_hint">- - -</string>
+    <string name="mg_dl">mg/dL</string>
+    <string name="enter_value">Ingresar Valor</string>
+    <string name="record_type_label">TIPO DE REGISTRO</string>
+    <string name="fasting">Ayunas</string>
+    <string name="before_lunch">Antes de\nAlmuerzo</string>
+    <string name="after_lunch">Después de\nAlmuerzo</string>
+    <string name="dinner">Cena</string>
+    <string name="optional_notes">NOTAS OPCIONALES</string>
+    <string name="arrow_up">∧</string>
+    <string name="arrow_down">∨</string>
+    <string name="add_notes_hint">Añadir notas&#8230;</string>
+    <string name="previous_summary_label">RESUMEN PREVIO</string>
+    <string name="no_previous_records">No hay registros previos</string>
+    <string name="save_record_btn">+ GUARDAR REGISTRO</string>
+    <string name="icon_description">Icono de glucosa</string>
 </resources>
