@@ -1,183 +1,166 @@
 package pa.ac.utp.salud_app
 
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import com.google.android.material.datepicker.MaterialDatePicker
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class ModuloPresion : AppCompatActivity() {
 
-    private lateinit var btnFecha: Button
-    private lateinit var txtFecha: TextView
-    private lateinit var tvHora: TextView
-    private lateinit var timePicker: TimePicker
-    private lateinit var npSistolica: NumberPicker
-    private lateinit var npDiastolica: NumberPicker
-    private lateinit var npPulso: NumberPicker
-    private lateinit var rgBrazo: RadioGroup
+    private lateinit var etSistolica: EditText
+    private lateinit var etDiastolica: EditText
+    private lateinit var etPulso: EditText
+    private lateinit var btnSeleccionarFecha: Button
     private lateinit var btnAnalizar: Button
-    private lateinit var cardResultado: CardView
-    private lateinit var txtResultado: TextView
-    private lateinit var tvClasificacion: TextView
+    private lateinit var cardResultado: View
+    private lateinit var tvEstadoPresion: TextView
     private lateinit var tvConsejo: TextView
-
-    private var fechaSeleccionada: String? = null
+    private lateinit var lineChartPresion: LineChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_presion)
 
-        btnFecha       = findViewById(R.id.btnFecha)
-        txtFecha       = findViewById(R.id.txtFecha)
-        tvHora         = findViewById(R.id.tvHora)
-        timePicker     = findViewById(R.id.timePicker)
-        npSistolica    = findViewById(R.id.npSistolica)
-        npDiastolica   = findViewById(R.id.npDiastolica)
-        npPulso        = findViewById(R.id.npPulso)
-        rgBrazo        = findViewById(R.id.rgBrazo)
-        btnAnalizar    = findViewById(R.id.btnAnalizar)
-        cardResultado  = findViewById(R.id.cardResultado)
-        txtResultado   = findViewById(R.id.txtResultado)
-        tvClasificacion = findViewById(R.id.tvClasificacion)
-        tvConsejo      = findViewById(R.id.tvConsejo)
+        etSistolica = findViewById(R.id.etSistolica)
+        etDiastolica = findViewById(R.id.etDiastolica)
+        etPulso = findViewById(R.id.etPulso)
+        btnSeleccionarFecha = findViewById(R.id.btnSeleccionarFecha)
+        btnAnalizar = findViewById(R.id.btnAnalizar)
+        cardResultado = findViewById(R.id.cardResultado)
+        tvEstadoPresion = findViewById(R.id.tvEstadoPresion)
+        tvConsejo = findViewById(R.id.tvConsejo)
+        lineChartPresion = findViewById(R.id.lineChartPresion)
 
-        // Configuración TimePicker en formato 12h
-        timePicker.setIs24HourView(false)
-        timePicker.setOnTimeChangedListener { _, hour, minute ->
-            tvHora.text = formatearHora12(hour, minute)
+        btnAnalizar.setOnClickListener {
+            analizarPresion()
         }
 
-        // Hora inicial en tvHora
-        val calNow = Calendar.getInstance()
-        tvHora.text = formatearHora12(
-            calNow.get(Calendar.HOUR_OF_DAY),
-            calNow.get(Calendar.MINUTE)
-        )
-
-        // Rangos NumberPicker (clínicamente razonables)
-        npSistolica.minValue  = 80;  npSistolica.maxValue  = 200; npSistolica.value  = 120
-        npDiastolica.minValue = 40;  npDiastolica.maxValue = 130; npDiastolica.value =  80
-        npPulso.minValue      = 40;  npPulso.maxValue      = 180; npPulso.value      =  72
-
-        // Sin ciclo infinito: el picker no regresa al inicio al llegar al extremo
-        npSistolica.wrapSelectorWheel  = false
-        npDiastolica.wrapSelectorWheel = false
-        npPulso.wrapSelectorWheel      = false
-
-        // Forzar color texto oscuro en todos los pickers (reflection, API 24+)
-        listOf(npSistolica, npDiastolica, npPulso).forEach { it.forzarColorTexto() }
-        // El TimePicker contiene NumberPickers internos; se aplica después de layout
-        timePicker.post {
-            repeat(timePicker.childCount) { i ->
-                val child = timePicker.getChildAt(i)
-                if (child is NumberPicker) child.forzarColorTexto()
-            }
+        val btnVerHistorialPresion = findViewById<TextView>(R.id.btnVerHistorialPresion)
+        btnVerHistorialPresion.setOnClickListener {
+            mostrarBottomSheetHistorial()
         }
 
-        btnFecha.setOnClickListener   { mostrarDatePicker() }
-        btnAnalizar.setOnClickListener { analizarMedicion() }
+        cargarGrafico(lineChartPresion)
     }
 
-    private fun mostrarDatePicker() {
-        val picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Seleccionar fecha de medición")
-            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-            .build()
+    private fun cargarGrafico(chart: LineChart) {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_presion", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
 
-        picker.addOnPositiveButtonClickListener { seleccion ->
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            fechaSeleccionada = sdf.format(Date(seleccion))
-            txtFecha.text = "Fecha: $fechaSeleccionada"
-            btnFecha.text = "Fecha: $fechaSeleccionada"
-        }
+        chart.setNoDataText("Aún no hay registros")
+        chart.setNoDataTextColor(Color.parseColor("#94A3B8"))
 
-        picker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
-    }
-
-    private fun analizarMedicion() {
-        if (fechaSeleccionada == null) {
-            Toast.makeText(this, "Debe seleccionar una fecha", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (rgBrazo.checkedRadioButtonId == -1) {
-            Toast.makeText(this, "Debe seleccionar el brazo de medición", Toast.LENGTH_SHORT).show()
+        if (array.length() == 0) {
+            chart.clear()
             return
         }
 
-        val sistolica  = npSistolica.value
-        val diastolica = npDiastolica.value
-        val pulso      = npPulso.value
-        val hora       = formatearHora12(timePicker.hour, timePicker.minute)
-        val brazo      = findViewById<RadioButton>(rgBrazo.checkedRadioButtonId).text
-
-        val clasificacion = clasificarPresion(sistolica, diastolica)
-
-        val badgeColor = when (clasificacion) {
-            "Presión baja"    -> Color.parseColor("#2196F3")
-            "Presión normal"  -> Color.parseColor("#4CAF50")
-            "Presión elevada" -> Color.parseColor("#FF9800")
-            else              -> Color.parseColor("#F44336")
+        val entries = ArrayList<Entry>()
+        for (i in 0 until array.length()) {
+            val registro = array.getJSONObject(i)
+            val sistolica = registro.getDouble("sistolica").toFloat()
+            entries.add(Entry((i + 1).toFloat(), sistolica))
         }
-        val consejo = when (clasificacion) {
-            "Presión baja"    -> "ⓘ  Manténgase hidratado y evite cambios bruscos de posición."
-            "Presión normal"  -> "ⓘ  Su presión está en un rango saludable. Mantenga un estilo de vida activo."
-            "Presión elevada" -> "ⓘ  Reduzca el consumo de sal y realice actividad física moderada."
-            else              -> "ⓘ  Consulte a un médico. Evite el estrés y siga las indicaciones médicas."
-        }
+        
+        val dataSet = LineDataSet(entries, "Sistólica (mmHg)")
+        dataSet.color = Color.parseColor("#EF4444")
+        dataSet.setCircleColor(Color.parseColor("#EF4444"))
+        dataSet.lineWidth = 3f
+        dataSet.circleRadius = 5f
+        dataSet.setDrawValues(false)
 
-        txtResultado.text = """
-            Fecha: $fechaSeleccionada
-            Hora: $hora
-            Sistólica: $sistolica mmHg         Pulso: $pulso BPM
-            Diastólica: $diastolica mmHg        Brazo: $brazo
-        """.trimIndent()
-
-        val bg = GradientDrawable().apply {
-            shape        = GradientDrawable.RECTANGLE
-            cornerRadius = 10f * resources.displayMetrics.density
-            setColor(badgeColor)
-        }
-        tvClasificacion.text       = clasificacion.uppercase()
-        tvClasificacion.setTextColor(Color.WHITE)
-        tvClasificacion.background = bg
-        tvConsejo.text             = consejo
-        cardResultado.visibility   = View.VISIBLE
+        val lineData = LineData(dataSet)
+        chart.data = lineData
+        chart.description.isEnabled = false
+        chart.xAxis.setDrawGridLines(false)
+        chart.axisRight.isEnabled = false
+        chart.animateX(1000)
     }
 
-    private fun clasificarPresion(sistolica: Int, diastolica: Int): String = when {
-        sistolica < 90 || diastolica < 60                    -> "Presión baja"
-        sistolica in 90..119 && diastolica in 60..79         -> "Presión normal"
-        sistolica in 120..129 && diastolica < 80             -> "Presión elevada"
-        else                                                  -> "Hipertensión"
-    }
+    private fun analizarPresion() {
+        val sisStr = etSistolica.text.toString()
+        val diaStr = etDiastolica.text.toString()
+        val pulsoStr = etPulso.text.toString()
 
-    /** API 29+: setTextColor() público. API 24-28: reflection sobre mSelectorWheelPaint. */
-    private fun NumberPicker.forzarColorTexto() {
-        val textColor = Color.parseColor("#1A2D4A")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            setTextColor(textColor)
-        } else {
-            try {
-                val field = NumberPicker::class.java.getDeclaredField("mSelectorWheelPaint")
-                field.isAccessible = true
-                (field.get(this) as Paint).color = textColor
-            } catch (_: Exception) {}
+        if (sisStr.isEmpty() || diaStr.isEmpty() || pulsoStr.isEmpty()) {
+            Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+            return
         }
-        invalidate()
+
+        val sis = sisStr.toIntOrNull() ?: 0
+        val dia = diaStr.toIntOrNull() ?: 0
+
+        val (estado, color, consejo) = when {
+            sis < 120 && dia < 80 -> Triple("Normal", "#10B981", "¡Excelente! Mantén tus hábitos.")
+            sis in 120..129 && dia < 80 -> Triple("Elevada", "#F59E0B", "Atención, cuida tu dieta.")
+            sis in 130..139 || dia in 80..89 -> Triple("Hipertensión Nivel 1", "#EF4444", "Consulta a tu médico.")
+            sis >= 140 || dia >= 90 -> Triple("Hipertensión Nivel 2", "#B91C1C", "Requiere atención médica.")
+            else -> Triple("Indeterminada", "#64748B", "Vuelve a medir.")
+        }
+
+        tvEstadoPresion.text = "Estado: $estado"
+        tvEstadoPresion.setTextColor(Color.parseColor(color))
+        tvConsejo.text = consejo
+        cardResultado.visibility = View.VISIBLE
+
+        guardarRegistro(sis, dia)
+        cargarGrafico(lineChartPresion)
     }
 
-    private fun formatearHora12(hour: Int, minute: Int): String {
-        val h12  = when { hour == 0 -> 12; hour > 12 -> hour - 12; else -> hour }
-        val amPm = if (hour < 12) "AM" else "PM"
-        return String.format("%02d:%02d %s", h12, minute, amPm)
+    private fun mostrarBottomSheetHistorial() {
+        val bottomSheetDialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_bottom_sheet_historial, null)
+        bottomSheetDialog.setContentView(view)
+
+        val lvHistorial = view.findViewById<android.widget.ListView>(R.id.lvHistorial)
+        
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_presion", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+
+        val listaString = mutableListOf<String>()
+        for (i in 0 until array.length()) {
+            val obj = array.getJSONObject(i)
+            val fecha = obj.getString("fecha")
+            val sistolica = obj.getInt("sistolica")
+            val diastolica = obj.getInt("diastolica")
+            listaString.add("Fecha: $fecha\nPresión: $sistolica / $diastolica mmHg")
+        }
+
+        if (listaString.isEmpty()) {
+            listaString.add("Aún no hay registros.")
+        }
+
+        val adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, listaString)
+        lvHistorial.adapter = adapter
+
+        bottomSheetDialog.show()
     }
 
+    private fun guardarRegistro(sistolica: Int, diastolica: Int) {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_presion", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+        val registro = JSONObject().apply {
+            put("fecha", SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date()))
+            put("sistolica", sistolica)
+            put("diastolica", diastolica)
+        }
+        array.put(registro)
+        prefs.edit().putString("historial_presion", array.toString()).apply()
+    }
 }

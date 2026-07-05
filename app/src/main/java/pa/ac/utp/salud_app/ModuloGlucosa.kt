@@ -1,145 +1,182 @@
 package pa.ac.utp.salud_app
 
-import android.graphics.drawable.GradientDrawable
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ModuloGlucosa : AppCompatActivity() {
 
-    private lateinit var tvFechaHoraRegistro: TextView
     private lateinit var etGlucosa: EditText
     private lateinit var etNotas: EditText
-    private lateinit var headerNotas: LinearLayout
-    private lateinit var tvArrowNotas: TextView
-    private lateinit var btnGuardarRegistro: Button
+    private lateinit var btnGuardar: Button
     private lateinit var tvResumenPrevio: TextView
-
-    private lateinit var rowAyunas: LinearLayout
-    private lateinit var rowAntesAlmuerzo: LinearLayout
-    private lateinit var rowDespuesAlmuerzo: LinearLayout
-    private lateinit var rowCena: LinearLayout
+    private lateinit var lineChartGlucosa: LineChart
 
     private var tipoSeleccionado: String = ""
-    private var notasExpandidas: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_glucosa)
 
-        tvFechaHoraRegistro = findViewById(R.id.tvFechaHoraRegistro)
         etGlucosa           = findViewById(R.id.etGlucosa)
         etNotas             = findViewById(R.id.etNotas)
-        headerNotas         = findViewById(R.id.headerNotas)
-        tvArrowNotas        = findViewById(R.id.tvArrowNotas)
-        btnGuardarRegistro  = findViewById(R.id.btnGuardarRegistro)
+        btnGuardar          = findViewById(R.id.btnGuardar)
         tvResumenPrevio     = findViewById(R.id.tvResumenPrevio)
-        rowAyunas           = findViewById(R.id.rowAyunas)
-        rowAntesAlmuerzo    = findViewById(R.id.rowAntesAlmuerzo)
-        rowDespuesAlmuerzo  = findViewById(R.id.rowDespuesAlmuerzo)
-        rowCena             = findViewById(R.id.rowCena)
-
-        actualizarFechaHora()
-
-        rowAyunas.setOnClickListener          { seleccionarTipo(rowAyunas,          "Ayunas")              }
-        rowAntesAlmuerzo.setOnClickListener   { seleccionarTipo(rowAntesAlmuerzo,   "Antes de Almuerzo")   }
-        rowDespuesAlmuerzo.setOnClickListener { seleccionarTipo(rowDespuesAlmuerzo, "Después de Almuerzo") }
-        rowCena.setOnClickListener            { seleccionarTipo(rowCena,            "Cena")                }
-
-        headerNotas.setOnClickListener        { toggleNotas() }
-        btnGuardarRegistro.setOnClickListener { guardarRegistro() }
-    }
-
-    private fun actualizarFechaHora() {
-        val cal    = Calendar.getInstance()
-        val locale = Locale.forLanguageTag("es-PA")
-        val dia    = SimpleDateFormat("EEEE", locale).format(cal.time)
-            .replaceFirstChar { it.uppercase() }
-        val fecha  = SimpleDateFormat("d 'de' MMMM", locale).format(cal.time)
-        val hora   = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(cal.time)
+        lineChartGlucosa    = findViewById(R.id.lineChartGlucosa)
         
-        val recordText = getString(R.string.record_today_loading)
-            .replace("Cargando&#8230;", "$dia, $fecha | $hora")
-            .replace("Cargando...", "$dia, $fecha | $hora")
-            
-        tvFechaHoraRegistro.text = recordText
-    }
+        val rowAyuno = findViewById<TextView>(R.id.rowAyuno)
+        val rowPreComida = findViewById<TextView>(R.id.rowPreComida)
+        val rowPostComida = findViewById<TextView>(R.id.rowPostComida)
 
-    private fun seleccionarTipo(rowSeleccionada: LinearLayout, tipo: String) {
-        val filas = listOf(rowAyunas, rowAntesAlmuerzo, rowDespuesAlmuerzo, rowCena)
-        val dp    = resources.displayMetrics.density
+        val filas = listOf(rowAyuno, rowPreComida, rowPostComida)
 
-        filas.forEach { fila ->
-            val bg = GradientDrawable().apply {
-                shape        = GradientDrawable.RECTANGLE
-                cornerRadius = 8f * dp
-                setColor(if (fila === rowSeleccionada) 0xFFD0E4FF.toInt() else 0xFFF0F4F8.toInt())
-            }
-            fila.background = bg
+        fun seleccionarFila(fila: TextView, tipo: String) {
+            filas.forEach { it.setTextColor(Color.parseColor("#1E293B")) }
+            fila.setTextColor(Color.parseColor("#8B5CF6")) // Acento Morado
+            tipoSeleccionado = tipo
         }
 
-        tipoSeleccionado = tipo
+        rowAyuno.setOnClickListener { seleccionarFila(rowAyuno, "Ayuno") }
+        rowPreComida.setOnClickListener { seleccionarFila(rowPreComida, "Pre-Comida") }
+        rowPostComida.setOnClickListener { seleccionarFila(rowPostComida, "Post-Comida") }
+
+        val btnVerHistorialGlucosa = findViewById<TextView>(R.id.btnVerHistorialGlucosa)
+        btnVerHistorialGlucosa.setOnClickListener {
+            mostrarBottomSheetHistorial()
+        }
+
+        btnGuardar.setOnClickListener { guardarRegistro() }
+        
+        cargarUltimoRegistro()
+        cargarGrafico(lineChartGlucosa)
     }
 
-    private fun toggleNotas() {
-        notasExpandidas     = !notasExpandidas
-        etNotas.visibility  = if (notasExpandidas) View.VISIBLE else View.GONE
-        tvArrowNotas.text   = if (notasExpandidas) getString(R.string.arrow_up) else getString(R.string.arrow_down)
+    private fun cargarUltimoRegistro() {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+        if (array.length() > 0) {
+            val last = array.getJSONObject(array.length() - 1)
+            tvResumenPrevio.text = "Último: ${last.getDouble("glucosa")} mg/dL (${last.getString("tipo")}) a las ${last.getString("fecha")}"
+        }
+    }
+
+    private fun cargarGrafico(chart: LineChart) {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+
+        chart.setNoDataText("Aún no hay registros")
+        chart.setNoDataTextColor(Color.parseColor("#94A3B8"))
+
+        if (array.length() == 0) {
+            chart.clear()
+            return
+        }
+
+        val entries = ArrayList<Entry>()
+        for (i in 0 until array.length()) {
+            val obj = array.getJSONObject(i)
+            val glucosa = obj.getDouble("glucosa").toFloat()
+            entries.add(Entry((i + 1).toFloat(), glucosa))
+        }
+        
+        val dataSet = LineDataSet(entries, "Glucosa (mg/dL)")
+        dataSet.color = Color.parseColor("#8B5CF6")
+        dataSet.setCircleColor(Color.parseColor("#8B5CF6"))
+        dataSet.lineWidth = 3f
+        dataSet.circleRadius = 5f
+        dataSet.setDrawValues(false)
+
+        val lineData = LineData(dataSet)
+        chart.data = lineData
+        chart.description.isEnabled = false
+        chart.xAxis.setDrawGridLines(false)
+        chart.axisRight.isEnabled = false
+        chart.animateX(1000)
+    }
+
+    private fun mostrarBottomSheetHistorial() {
+        val bottomSheetDialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_bottom_sheet_historial, null)
+        bottomSheetDialog.setContentView(view)
+
+        val lvHistorial = view.findViewById<android.widget.ListView>(R.id.lvHistorial)
+        
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+
+        val listaString = mutableListOf<String>()
+        for (i in 0 until array.length()) {
+            val obj = array.getJSONObject(i)
+            val fecha = obj.getString("fecha")
+            val glucosa = obj.getDouble("glucosa")
+            val tipo = obj.getString("tipo")
+            listaString.add("Momento: $fecha\nNivel: $glucosa mg/dL ($tipo)")
+        }
+
+        if (listaString.isEmpty()) {
+            listaString.add("Aún no hay registros.")
+        }
+
+        val adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, listaString)
+        lvHistorial.adapter = adapter
+
+        bottomSheetDialog.show()
     }
 
     private fun guardarRegistro() {
         val valorGlucosaStr = etGlucosa.text.toString().trim()
-        val notas           = etNotas.text.toString().trim()
 
         if (valorGlucosaStr.isEmpty()) {
-            Toast.makeText(this, getString(R.string.enter_glucose_error), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Ingresa un valor de glucosa", Toast.LENGTH_SHORT).show()
             return
         }
 
         val valorGlucosa = valorGlucosaStr.toDoubleOrNull()
         if (valorGlucosa == null || valorGlucosa <= 0 || valorGlucosa > 600) {
-            Toast.makeText(this, getString(R.string.invalid_glucose_error), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Valor de glucosa inválido", Toast.LENGTH_SHORT).show()
             return
         }
 
         if (tipoSeleccionado.isEmpty()) {
-            Toast.makeText(this, getString(R.string.select_type_error), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Selecciona un momento (Ej: Ayuno)", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val notasTexto = notas.ifEmpty { getString(R.string.no_notes) }
         val horaActual = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        tvResumenPrevio.text = "Último: $valorGlucosa mg/dL ($tipoSeleccionado) a las $horaActual"
+        Toast.makeText(this, "Registro Guardado Exitosamente", Toast.LENGTH_SHORT).show()
         
-        // Actualizar el resumen previo en la UI usando un recurso con formato
-        tvResumenPrevio.text = getString(R.string.previous_summary_format, valorGlucosa, getString(R.string.mg_dl), tipoSeleccionado, horaActual)
+        // Guardar en SharedPreferences
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
+        val array = JSONArray(jsonStr)
+        val registro = JSONObject().apply {
+            put("fecha", horaActual)
+            put("glucosa", valorGlucosa)
+            put("tipo", tipoSeleccionado)
+        }
+        array.put(registro)
+        prefs.edit().putString("historial_glucosa", array.toString()).apply()
 
-        val mensaje = getString(R.string.record_saved_msg, valorGlucosa, getString(R.string.mg_dl), tipoSeleccionado, notasTexto)
-        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-
-        // Limpiar campos después de guardar
         etGlucosa.setText("")
         etNotas.setText("")
         tipoSeleccionado = ""
-        restablecerColoresFilas()
-    }
-
-    private fun restablecerColoresFilas() {
-        val filas = listOf(rowAyunas, rowAntesAlmuerzo, rowDespuesAlmuerzo, rowCena)
-        val dp    = resources.displayMetrics.density
-        filas.forEach { fila ->
-            val bg = GradientDrawable().apply {
-                shape        = GradientDrawable.RECTANGLE
-                cornerRadius = 8f * dp
-                setColor(0xFFF0F4F8.toInt())
-            }
-            fila.background = bg
-        }
+        
+        cargarGrafico(lineChartGlucosa)
     }
 }

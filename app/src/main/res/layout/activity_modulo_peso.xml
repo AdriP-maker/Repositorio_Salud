@@ -1,268 +1,265 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="#F8FAFC"
     android:fillViewport="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        tools:context=".ModuloPeso">
 
-        <!-- Título -->
+        <!-- Title -->
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Control de Peso"
-            android:textSize="26sp"
+            android:textColor="#0F172A"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="#1A4375"
-            android:layout_gravity="center"
-            android:layout_marginBottom="32dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Etiqueta Edad -->
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edad"
-            android:textColor="#5E7A9D"
-            android:textSize="13sp"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginTop="4dp"
+            android:text="Supervisa tu progreso corporal"
+            android:textColor="#64748B"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-        <!-- Campo Edad -->
-        <EditText
-            android:id="@+id/etEdad"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/input_round"
-            android:paddingHorizontal="16dp"
-            android:hint="Ej. 25"
-            android:inputType="number"
-            android:textColorHint="#AABCD4"
-            android:textColor="#1A2D4A"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Fila Peso + Switch -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Input Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardInput"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="4dp">
+            android:layout_marginTop="32dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Peso"
-                android:textColor="#5E7A9D"
-                android:textSize="13sp" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swPesoUnit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="KG / LB"
-                android:textColor="#1A4375"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Campo Peso -->
-        <EditText
-            android:id="@+id/etPeso"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/input_round"
-            android:paddingHorizontal="16dp"
-            android:hint="Peso (Kg)"
-            android:inputType="numberDecimal"
-            android:textColorHint="#AABCD4"
-            android:textColor="#1A2D4A"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Fila Estatura + Switch -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Estatura"
-                android:textColor="#5E7A9D"
-                android:textSize="13sp" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swEstaturaUnit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CM / IN"
-                android:textColor="#1A4375"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Campo Estatura -->
-        <EditText
-            android:id="@+id/etEstatura"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/input_round"
-            android:paddingHorizontal="16dp"
-            android:hint="Estatura (cm)"
-            android:inputType="numberDecimal"
-            android:textColorHint="#AABCD4"
-            android:textColor="#1A2D4A"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Botón Calcular -->
-        <Button
-            android:id="@+id/btnCalcular"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="CALCULAR"
-            android:textStyle="bold"
-            android:backgroundTint="#1A4375"
-            android:textColor="#FFFFFF"
-            app:cornerRadius="12dp"
-            android:layout_marginBottom="32dp" />
-
-        <!-- CardView Resultados -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="24dp">
 
-                <!-- Fila métricas: IMC | PESO IDEAL | GRASA -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                <ImageView
+                    android:id="@+id/ivIconPeso"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/icon_peso_3d"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <!-- IMC -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="IMC"
-                            android:textColor="#5E7A9D"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvIMC"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textColor="#2E7D32"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- PESO IDEAL -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="PESO IDEAL"
-                            android:textColor="#5E7A9D"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvPesoIdeal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textColor="#2E7D32"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- GRASA -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="GRASA"
-                            android:textColor="#5E7A9D"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvGrasa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textColor="#2E7D32"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Separador -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E8F0"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Clasificación -->
                 <TextView
-                    android:id="@+id/tvClasificacion"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvInputLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Resultado"
-                    android:gravity="center"
-                    android:textColor="#1A4375"
+                    android:layout_marginStart="16dp"
+                    android:text="Ingresar Datos"
+                    android:textColor="#0F172A"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/ivIconPeso"
+                    app:layout_constraintStart_toEndOf="@id/ivIconPeso"
+                    app:layout_constraintTop_toTopOf="@id/ivIconPeso" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swPesoUnit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Libras"
+                    android:textColor="#64748B"
+                    app:layout_constraintEnd_toStartOf="@id/swEstaturaUnit"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ivIconPeso" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swEstaturaUnit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Pulgadas"
+                    android:textColor="#64748B"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/swPesoUnit"
+                    app:layout_constraintTop_toBottomOf="@id/ivIconPeso" />
+
+                <EditText
+                    android:id="@+id/etPeso"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:backgroundTint="#F1F5F9"
+                    android:hint="Peso (kg)"
+                    android:textColorHint="#94A3B8"
+                    android:textColor="#0F172A"
+                    android:inputType="numberDecimal"
+                    android:paddingHorizontal="16dp"
+                    app:layout_constraintEnd_toStartOf="@id/etAltura"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/swPesoUnit" />
+
+                <EditText
+                    android:id="@+id/etAltura"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:backgroundTint="#F1F5F9"
+                    android:hint="Altura (m)"
+                    android:textColorHint="#94A3B8"
+                    android:textColor="#0F172A"
+                    android:inputType="numberDecimal"
+                    android:paddingHorizontal="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/etPeso"
+                    app:layout_constraintTop_toBottomOf="@id/swEstaturaUnit" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCalcular"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="24dp"
+                    android:text="Calcular y Guardar"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:backgroundTint="#2563EB"
+                    app:cornerRadius="32dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/etPeso" />
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Botón Ver Historial -->
-        <Button
-            android:id="@+id/btnVerHistorial"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="VER HISTORIAL"
-            android:textStyle="bold"
-            android:backgroundTint="#5E7A9D"
-            android:textColor="#FFFFFF"
-            app:cornerRadius="12dp"
-            android:layout_marginTop="16dp" />
+        <!-- Result Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardResult"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardInput">
 
-    </LinearLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/tvImcResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="IMC: 22.5"
+                    android:textColor="#1D4ED8"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvImcClasificacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Peso Saludable"
+                    android:textColor="#10B981"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvImcResult" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Graph Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardChart"
+            android:layout_width="0dp"
+            android:layout_height="320dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardResult">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/tvChartTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tendencias de Peso"
+                    android:textColor="#0F172A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChartPeso"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintBottom_toTopOf="@id/btnVerHistorial"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvChartTitle" />
+
+                <TextView
+                    android:id="@+id/btnVerHistorial"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ver Historial Detallado"
+                    android:textColor="#2563EB"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
