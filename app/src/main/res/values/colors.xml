@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Material You vibrant colors -->
+    <color name="colorPrimary">#1A73E8</color>
+    <color name="colorPrimaryContainer">#D2E3FC</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnPrimaryContainer">#042B66</color>
+
+    <color name="colorSecondary">#FF3366</color>
+    <color name="colorSecondaryContainer">#FFD9E2</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorOnSecondaryContainer">#66001B</color>
+
+    <color name="colorBackground">#F8F9FA</color>
+    <color name="colorOnBackground">#1F1F1F</color>
+
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#E8EAED</color>
+    <color name="colorOnSurface">#202124</color>
+
+    <color name="colorError">#EA4335</color>
+    
+    <color name="agua">#42A5F5</color>
+    <color name="glucosa">#FFA000</color>
+    <color name="presion">#EF5350</color>
 </resources>
