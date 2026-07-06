@@ -1,5 +1,6 @@
 package pa.ac.utp.salud_app
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,37 +10,51 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONArray
 import java.util.Locale
 
-data class RegistroPeso(
-    val fecha: String,
-    val peso: Double,
-    val imc: Double
-)
-
 class HistorialPesoActivity : AppCompatActivity() {
+
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var lvHistorial: ListView
+    private lateinit var adapter: PesoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_historial_peso)
 
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        val jsonStr = prefs.getString("historial_peso", "[]") ?: "[]"
-        val array = JSONArray(jsonStr)
-        val listaRegistros = (array.length() - 1 downTo 0).map { i ->
-            val obj = array.getJSONObject(i)
-            RegistroPeso(
-                obj.getString("fecha"),
-                obj.getDouble("peso"),
-                obj.getDouble("imc")
-            )
-        }
+        dbHelper = DatabaseHelper.getInstance(this)
+        lvHistorial = findViewById(R.id.lvHistorial)
 
-        val lvHistorial = findViewById<ListView>(R.id.lvHistorial)
-        val adapter = PesoAdapter(this, listaRegistros)
+        cargarHistorial()
+
+        // Long-click sobre un registro para poder borrarlo (SQL: DELETE FROM peso WHERE id=?)
+        lvHistorial.setOnItemLongClickListener { _, _, position, _ ->
+            val registro = adapter.getItem(position) as RegistroPeso
+            confirmarEliminacion(registro)
+            true
+        }
+    }
+
+    private fun cargarHistorial() {
+        // SELECT * FROM peso ORDER BY id DESC (ya viene ordenado desde DatabaseHelper)
+        val listaRegistros = dbHelper.obtenerHistorialPeso()
+        adapter = PesoAdapter(this, listaRegistros)
         lvHistorial.adapter = adapter
+    }
+
+    private fun confirmarEliminacion(registro: RegistroPeso) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar registro")
+            .setMessage("¿Eliminar el registro del ${registro.fecha}?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                dbHelper.eliminarPeso(registro.id)
+                Toast.makeText(this, "Registro eliminado", Toast.LENGTH_SHORT).show()
+                cargarHistorial()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 }
 
@@ -50,7 +65,7 @@ class PesoAdapter(
 
     override fun getCount(): Int = data.size
     override fun getItem(position: Int): Any = data[position]
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemId(position: Int): Long = data[position].id.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = convertView

@@ -22,9 +22,16 @@ class Splash : AppCompatActivity() {
 
         // 2. Lógica del temporizador (Handler)
         // Se coloca arriba para asegurar que empiece a contar de inmediato
+        val sesionManager = SesionManager(this)
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            // Si ya hay una sesión guardada en SharedPreferences, entramos directo
+            // al menú principal; si no, pedimos el nombre en el Login.
+            val destino = if (sesionManager.haySesionActiva()) {
+                MainActivity::class.java
+            } else {
+                LoginActivity::class.java
+            }
+            startActivity(Intent(this, destino))
             finish() // Cierra el Splash para que no se pueda volver con el botón atrás
         }, 3000) // 3 segundos es ideal para un splash
 

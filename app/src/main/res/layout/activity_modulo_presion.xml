@@ -127,18 +127,65 @@
                         android:inputType="number"
                         android:paddingHorizontal="12dp" />
                 </LinearLayout>
-                
-                <!-- Date Picker -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSeleccionarFecha"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+                <RadioGroup
+                    android:id="@+id/rgBrazo"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Fecha: Hoy"
-                    android:textColor="#334155"
-                    app:cornerRadius="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/llInputs" />
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/llInputs">
+
+                    <RadioButton
+                        android:id="@+id/rbBrazoIzquierdo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Brazo Izquierdo"
+                        android:textColor="#334155"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/rbBrazoDerecho"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Brazo Derecho"
+                        android:textColor="#334155" />
+                </RadioGroup>
+
+                <!-- Fecha y hora de la medición -->
+                <LinearLayout
+                    android:id="@+id/llFechaHora"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    app:layout_constraintTop_toBottomOf="@id/rgBrazo">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeleccionarFecha"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Fecha: Hoy"
+                        android:textColor="#334155"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSeleccionarHora"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Hora: Ahora"
+                        android:textColor="#334155"
+                        app:cornerRadius="16dp" />
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAnalizar"
@@ -153,7 +200,7 @@
                     app:cornerRadius="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/btnSeleccionarFecha" />
+                    app:layout_constraintTop_toBottomOf="@id/llFechaHora" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

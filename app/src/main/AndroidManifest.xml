@@ -8,6 +8,11 @@
         android:required="false" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
+    <!-- Necesarios para los recordatorios de medicamentos -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -29,9 +34,19 @@
             </intent-filter>
         </activity>
 
+        <!-- Login local (guarda el nombre de usuario en SharedPreferences) -->
+        <activity
+            android:name="pa.ac.utp.salud_app.LoginActivity"
+            android:exported="false" />
+
         <!-- Menú principal -->
         <activity
             android:name="pa.ac.utp.salud_app.MainActivity"
+            android:exported="false" />
+
+        <!-- Perfil: cerrar sesión / borrar todos los datos -->
+        <activity
+            android:name="pa.ac.utp.salud_app.PerfilActivity"
             android:exported="false" />
 
         <!-- Calcular (existente) -->
@@ -67,6 +82,21 @@
         <activity
             android:name="pa.ac.utp.salud_app.ModuloActividad"
             android:exported="false" />
+
+        <!-- Recibe la alarma diaria y muestra la notificación del medicamento -->
+        <receiver
+            android:name="pa.ac.utp.salud_app.MedicinaReminderReceiver"
+            android:exported="false" />
+
+        <!-- Reprograma todos los recordatorios activos cuando el teléfono se reinicia
+             (las alarmas de AlarmManager se pierden al apagar el dispositivo) -->
+        <receiver
+            android:name="pa.ac.utp.salud_app.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

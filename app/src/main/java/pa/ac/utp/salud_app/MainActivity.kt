@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
@@ -13,10 +15,24 @@ import androidx.appcompat.app.AppCompatDelegate
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var sesionManager: SesionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_main)
+
+        sesionManager = SesionManager(this)
+
+        // Saludo personalizado con el nombre guardado en SharedPreferences (Login)
+        val tvSaludoUsuario = findViewById<TextView>(R.id.tvSaludoUsuario)
+        val nombre = sesionManager.obtenerNombreUsuario()
+        tvSaludoUsuario.text = if (nombre.isNotEmpty()) "Hola, $nombre 👋" else "Hola 👋"
+
+        // Acceso al perfil (cerrar sesión / borrar todos los datos)
+        findViewById<ImageView>(R.id.ivPerfil).setOnClickListener {
+            startActivity(Intent(this, PerfilActivity::class.java))
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

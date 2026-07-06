@@ -1,5 +1,6 @@
 package pa.ac.utp.salud_app
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.Manifest
@@ -9,6 +10,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,16 +27,24 @@ class ModuloActividad : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
     private var stepSensor: Sensor? = null
     private lateinit var tvSteps: TextView
+    private lateinit var tvMetaPasos: TextView
+    private lateinit var pbPasos: ProgressBar
     private var isSensorPresent = false
 
     private val PERMISSION_REQUEST_ACTIVITY_RECOGNITION = 100
+
+    // Opciones predefinidas de meta de pasos (además de "Personalizada")
+    private val metasPredefinidas = listOf(5000, 7500, 10000, 12500, 15000, 20000)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_actividad)
 
         tvSteps = findViewById(R.id.tvSteps)
+        tvMetaPasos = findViewById(R.id.tvMetaPasos)
+        pbPasos = findViewById(R.id.pbPasos)
         val barChartSteps = findViewById<BarChart>(R.id.barChartSteps)
+        val btnCambiarMeta = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCambiarMeta)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
@@ -46,6 +57,11 @@ class ModuloActividad : AppCompatActivity(), SensorEventListener {
             tvSteps.text = "0"
         }
 
+        btnCambiarMeta.setOnClickListener {
+            mostrarDialogoMeta()
+        }
+
+        actualizarProgreso()
         cargarHistorialPasos(barChartSteps)
     }
 
@@ -60,10 +76,80 @@ class ModuloActividad : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    // ---------------------------------------------------------------------
+    // Meta de pasos (guardada en SharedPreferences, igual que "pasos_hoy")
+    // ---------------------------------------------------------------------
+
+    private fun obtenerMetaPasos(): Int {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        return prefs.getInt("meta_pasos", 10000)
+    }
+
+    private fun guardarMetaPasos(meta: Int) {
+        getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+            .edit().putInt("meta_pasos", meta).apply()
+    }
+
+    private fun mostrarDialogoMeta() {
+        val opciones = metasPredefinidas.map { "${"%,d".format(it)} pasos" }.toMutableList()
+        opciones.add("Personalizada...")
+
+        AlertDialog.Builder(this)
+            .setTitle("Elige tu meta diaria")
+            .setItems(opciones.toTypedArray()) { dialog, which ->
+                if (which < metasPredefinidas.size) {
+                    guardarMetaPasos(metasPredefinidas[which])
+                    actualizarProgreso()
+                    Toast.makeText(this, "Meta actualizada", Toast.LENGTH_SHORT).show()
+                } else {
+                    mostrarDialogoMetaPersonalizada()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoMetaPersonalizada() {
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = "Ej. 8000"
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Meta personalizada")
+            .setMessage("¿Cuántos pasos quieres caminar al día?")
+            .setView(input)
+            .setPositiveButton("Guardar") { _, _ ->
+                val valor = input.text.toString().toIntOrNull()
+                if (valor == null || valor <= 0) {
+                    Toast.makeText(this, "Ingresa un número válido", Toast.LENGTH_SHORT).show()
+                } else {
+                    guardarMetaPasos(valor)
+                    actualizarProgreso()
+                    Toast.makeText(this, "Meta actualizada", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun actualizarProgreso() {
+        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
+        val pasosHoy = prefs.getInt("pasos_hoy", 0)
+        val meta = obtenerMetaPasos()
+
+        tvSteps.text = pasosHoy.toString()
+        tvMetaPasos.text = "Meta: ${"%,d".format(meta)} pasos"
+        val porcentaje = if (meta > 0) ((pasosHoy * 100) / meta).coerceIn(0, 100) else 0
+        pbPasos.progress = porcentaje
+    }
+
     private fun cargarHistorialPasos(chart: BarChart) {
         val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
         val pasosHoy = prefs.getInt("pasos_hoy", 0)
-        
+
         chart.setNoDataText("Aún no hay registros")
         chart.setNoDataTextColor(android.graphics.Color.parseColor("#94A3B8"))
 
@@ -98,8 +184,7 @@ class ModuloActividad : AppCompatActivity(), SensorEventListener {
                 sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
             }
         }
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        tvSteps.text = prefs.getInt("pasos_hoy", 0).toString()
+        actualizarProgreso()
     }
 
     override fun onPause() {
@@ -112,9 +197,9 @@ class ModuloActividad : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event != null) {
             val steps = event.values[0].toInt()
-            tvSteps.text = steps.toString()
             getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
                 .edit().putInt("pasos_hoy", steps).apply()
+            actualizarProgreso()
         }
     }
 

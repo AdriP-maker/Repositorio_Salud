@@ -1,5 +1,6 @@
 package pa.ac.utp.salud_app
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
@@ -11,13 +12,14 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import org.json.JSONArray
-import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ModuloGlucosa : AppCompatActivity() {
 
+    private lateinit var dbHelper: DatabaseHelper
+
+    private lateinit var tvFechaHoraRegistro: TextView
     private lateinit var etGlucosa: EditText
     private lateinit var etNotas: EditText
     private lateinit var btnGuardar: Button
@@ -30,17 +32,23 @@ class ModuloGlucosa : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_glucosa)
 
+        dbHelper = DatabaseHelper.getInstance(this)
+
+        tvFechaHoraRegistro = findViewById(R.id.tvFechaHoraRegistro)
         etGlucosa           = findViewById(R.id.etGlucosa)
         etNotas             = findViewById(R.id.etNotas)
         btnGuardar          = findViewById(R.id.btnGuardar)
         tvResumenPrevio     = findViewById(R.id.tvResumenPrevio)
         lineChartGlucosa    = findViewById(R.id.lineChartGlucosa)
-        
+
+        actualizarFechaHora()
+
         val rowAyuno = findViewById<TextView>(R.id.rowAyuno)
         val rowPreComida = findViewById<TextView>(R.id.rowPreComida)
         val rowPostComida = findViewById<TextView>(R.id.rowPostComida)
+        val rowCena = findViewById<TextView>(R.id.rowCena)
 
-        val filas = listOf(rowAyuno, rowPreComida, rowPostComida)
+        val filas = listOf(rowAyuno, rowPreComida, rowPostComida, rowCena)
 
         fun seleccionarFila(fila: TextView, tipo: String) {
             filas.forEach { it.setTextColor(Color.parseColor("#1E293B")) }
@@ -51,6 +59,7 @@ class ModuloGlucosa : AppCompatActivity() {
         rowAyuno.setOnClickListener { seleccionarFila(rowAyuno, "Ayuno") }
         rowPreComida.setOnClickListener { seleccionarFila(rowPreComida, "Pre-Comida") }
         rowPostComida.setOnClickListener { seleccionarFila(rowPostComida, "Post-Comida") }
+        rowCena.setOnClickListener { seleccionarFila(rowCena, "Cena") }
 
         val btnVerHistorialGlucosa = findViewById<TextView>(R.id.btnVerHistorialGlucosa)
         btnVerHistorialGlucosa.setOnClickListener {
@@ -63,34 +72,40 @@ class ModuloGlucosa : AppCompatActivity() {
         cargarGrafico(lineChartGlucosa)
     }
 
+    private fun actualizarFechaHora() {
+        val cal    = Calendar.getInstance()
+        val locale = Locale("es", "PA")
+        val dia    = SimpleDateFormat("EEEE", locale).format(cal.time)
+            .replaceFirstChar { it.uppercase() }
+        val fecha  = SimpleDateFormat("d 'de' MMMM", locale).format(cal.time)
+        val hora   = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(cal.time)
+        tvFechaHoraRegistro.text = "REGISTRO: Hoy - $dia, $fecha | $hora"
+    }
+
     private fun cargarUltimoRegistro() {
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
-        val array = JSONArray(jsonStr)
-        if (array.length() > 0) {
-            val last = array.getJSONObject(array.length() - 1)
-            tvResumenPrevio.text = "Último: ${last.getDouble("glucosa")} mg/dL (${last.getString("tipo")}) a las ${last.getString("fecha")}"
+        // SELECT * FROM glucosa ORDER BY id ASC (tomamos el último elemento)
+        val historial = dbHelper.obtenerHistorialGlucosa()
+        if (historial.isNotEmpty()) {
+            val last = historial.last()
+            tvResumenPrevio.text = "Último: ${last.glucosa} mg/dL (${last.tipo}) a las ${last.fecha}"
         }
     }
 
     private fun cargarGrafico(chart: LineChart) {
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
-        val array = JSONArray(jsonStr)
+        // SELECT * FROM glucosa ORDER BY id ASC
+        val historial = dbHelper.obtenerHistorialGlucosa()
 
         chart.setNoDataText("Aún no hay registros")
         chart.setNoDataTextColor(Color.parseColor("#94A3B8"))
 
-        if (array.length() == 0) {
+        if (historial.isEmpty()) {
             chart.clear()
             return
         }
 
         val entries = ArrayList<Entry>()
-        for (i in 0 until array.length()) {
-            val obj = array.getJSONObject(i)
-            val glucosa = obj.getDouble("glucosa").toFloat()
-            entries.add(Entry((i + 1).toFloat(), glucosa))
+        historial.forEachIndexed { i, registro ->
+            entries.add(Entry((i + 1).toFloat(), registro.glucosa.toFloat()))
         }
         
         val dataSet = LineDataSet(entries, "Glucosa (mg/dL)")
@@ -114,18 +129,14 @@ class ModuloGlucosa : AppCompatActivity() {
         bottomSheetDialog.setContentView(view)
 
         val lvHistorial = view.findViewById<android.widget.ListView>(R.id.lvHistorial)
-        
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
-        val array = JSONArray(jsonStr)
+
+        // SELECT * FROM glucosa ORDER BY id ASC
+        val historial = dbHelper.obtenerHistorialGlucosa()
 
         val listaString = mutableListOf<String>()
-        for (i in 0 until array.length()) {
-            val obj = array.getJSONObject(i)
-            val fecha = obj.getString("fecha")
-            val glucosa = obj.getDouble("glucosa")
-            val tipo = obj.getString("tipo")
-            listaString.add("Momento: $fecha\nNivel: $glucosa mg/dL ($tipo)")
+        for (registro in historial) {
+            val notaTexto = if (!registro.notas.isNullOrBlank()) "\nNotas: ${registro.notas}" else ""
+            listaString.add("Momento: ${registro.fecha}\nNivel: ${registro.glucosa} mg/dL (${registro.tipo})$notaTexto")
         }
 
         if (listaString.isEmpty()) {
@@ -135,11 +146,32 @@ class ModuloGlucosa : AppCompatActivity() {
         val adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, listaString)
         lvHistorial.adapter = adapter
 
+        // Long-click para borrar (SQL: DELETE FROM glucosa WHERE id=?)
+        lvHistorial.setOnItemLongClickListener { _, _, position, _ ->
+            if (historial.isNotEmpty() && position < historial.size) {
+                val registro = historial[position]
+                AlertDialog.Builder(this)
+                    .setTitle("Eliminar registro")
+                    .setMessage("¿Eliminar el registro de las ${registro.fecha}?")
+                    .setPositiveButton("Eliminar") { _, _ ->
+                        dbHelper.eliminarGlucosa(registro.id)
+                        Toast.makeText(this, "Registro eliminado", Toast.LENGTH_SHORT).show()
+                        cargarGrafico(lineChartGlucosa)
+                        cargarUltimoRegistro()
+                        bottomSheetDialog.dismiss()
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            }
+            true
+        }
+
         bottomSheetDialog.show()
     }
 
     private fun guardarRegistro() {
         val valorGlucosaStr = etGlucosa.text.toString().trim()
+        val notasTexto = etNotas.text.toString().trim()
 
         if (valorGlucosaStr.isEmpty()) {
             Toast.makeText(this, "Ingresa un valor de glucosa", Toast.LENGTH_SHORT).show()
@@ -161,17 +193,8 @@ class ModuloGlucosa : AppCompatActivity() {
         tvResumenPrevio.text = "Último: $valorGlucosa mg/dL ($tipoSeleccionado) a las $horaActual"
         Toast.makeText(this, "Registro Guardado Exitosamente", Toast.LENGTH_SHORT).show()
         
-        // Guardar en SharedPreferences
-        val prefs = getSharedPreferences("salud_app_prefs", MODE_PRIVATE)
-        val jsonStr = prefs.getString("historial_glucosa", "[]") ?: "[]"
-        val array = JSONArray(jsonStr)
-        val registro = JSONObject().apply {
-            put("fecha", horaActual)
-            put("glucosa", valorGlucosa)
-            put("tipo", tipoSeleccionado)
-        }
-        array.put(registro)
-        prefs.edit().putString("historial_glucosa", array.toString()).apply()
+        // INSERT INTO glucosa (fecha, glucosa, tipo, notas) VALUES (?, ?, ?, ?)
+        dbHelper.insertarGlucosa(horaActual, valorGlucosa, tipoSeleccionado, notasTexto.ifEmpty { null })
 
         etGlucosa.setText("")
         etNotas.setText("")

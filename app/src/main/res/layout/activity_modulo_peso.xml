@@ -102,6 +102,22 @@
                     app:layout_constraintTop_toBottomOf="@id/ivIconPeso" />
 
                 <EditText
+                    android:id="@+id/etEdad"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:backgroundTint="#F1F5F9"
+                    android:hint="Edad (años)"
+                    android:textColorHint="#94A3B8"
+                    android:textColor="#0F172A"
+                    android:inputType="number"
+                    android:paddingHorizontal="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/swPesoUnit" />
+
+                <EditText
                     android:id="@+id/etPeso"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -116,7 +132,7 @@
                     android:paddingHorizontal="16dp"
                     app:layout_constraintEnd_toStartOf="@id/etAltura"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/swPesoUnit" />
+                    app:layout_constraintTop_toBottomOf="@id/etEdad" />
 
                 <EditText
                     android:id="@+id/etAltura"
@@ -126,14 +142,14 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/rounded_edittext"
                     android:backgroundTint="#F1F5F9"
-                    android:hint="Altura (m)"
+                    android:hint="Altura (cm)"
                     android:textColorHint="#94A3B8"
                     android:textColor="#0F172A"
                     android:inputType="numberDecimal"
                     android:paddingHorizontal="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/etPeso"
-                    app:layout_constraintTop_toBottomOf="@id/swEstaturaUnit" />
+                    app:layout_constraintTop_toBottomOf="@id/etEdad" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCalcular"
@@ -197,6 +213,55 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvImcResult" />
+
+                <View
+                    android:id="@+id/dividerExtra"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#E2E8F0"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvImcClasificacion" />
+
+                <TextView
+                    android:id="@+id/tvPesoIdeal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="Peso ideal: 65.0 kg"
+                    android:textColor="#334155"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dividerExtra" />
+
+                <TextView
+                    android:id="@+id/tvGrasa"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Grasa corporal estimada: 18.0%"
+                    android:textColor="#334155"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvPesoIdeal" />
+
+                <TextView
+                    android:id="@+id/tvConsejoPeso"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="Consejo"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvGrasa" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
