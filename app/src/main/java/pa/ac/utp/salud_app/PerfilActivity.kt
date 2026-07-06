@@ -21,11 +21,39 @@ class PerfilActivity : AppCompatActivity() {
         dbHelper = DatabaseHelper.getInstance(this)
 
         val tvNombreUsuario = findViewById<TextView>(R.id.tvNombreUsuario)
+        val etEdadPerfil = findViewById<android.widget.EditText>(R.id.etEdadPerfil)
+        val etPesoPerfil = findViewById<android.widget.EditText>(R.id.etPesoPerfil)
+        val etAlturaPerfil = findViewById<android.widget.EditText>(R.id.etAlturaPerfil)
+        val btnGuardarPerfil = findViewById<Button>(R.id.btnGuardarPerfil)
+        
         val btnCerrarSesion = findViewById<Button>(R.id.btnCerrarSesion)
         val btnBorrarDatos = findViewById<Button>(R.id.btnBorrarDatos)
 
         val nombre = sesionManager.obtenerNombreUsuario()
         tvNombreUsuario.text = if (nombre.isNotEmpty()) nombre else "Usuario"
+        
+        etEdadPerfil.setText(sesionManager.obtenerEdad().toString())
+        etPesoPerfil.setText(sesionManager.obtenerPeso().toString())
+        etAlturaPerfil.setText(sesionManager.obtenerAltura().toString())
+
+        btnGuardarPerfil.setOnClickListener {
+            try {
+                val nuevaEdad = etEdadPerfil.text.toString().toInt()
+                val nuevoPeso = etPesoPerfil.text.toString().toFloat()
+                val nuevaAltura = etAlturaPerfil.text.toString().toFloat()
+                
+                sesionManager.actualizarPerfil(
+                    nombre = nombre,
+                    genero = sesionManager.obtenerGenero(), // Mantenemos el género por ahora o lo agregamos después
+                    edad = nuevaEdad,
+                    peso = nuevoPeso,
+                    altura = nuevaAltura
+                )
+                Toast.makeText(this, "Datos guardados", Toast.LENGTH_SHORT).show()
+            } catch (e: NumberFormatException) {
+                Toast.makeText(this, "Por favor revisa los números ingresados", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         btnCerrarSesion.setOnClickListener {
             AlertDialog.Builder(this)

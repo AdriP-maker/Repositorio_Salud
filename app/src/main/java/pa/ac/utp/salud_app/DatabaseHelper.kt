@@ -27,6 +27,7 @@ class DatabaseHelper(context: Context) :
         const val TABLE_GLUCOSA = "glucosa"
         const val TABLE_PRESION = "presion"
         const val TABLE_MEDICINA = "medicina"
+        const val TABLE_AGUA = "agua"
 
         // ---------- Columnas comunes ----------
         const val COL_ID = "id"
@@ -55,6 +56,10 @@ class DatabaseHelper(context: Context) :
         const val COL_MEDICINA_FRECUENCIA = "frecuencia"
         const val COL_MEDICINA_HORA_RECORDATORIO = "hora_recordatorio" // formato "HH:mm", null si no tiene
         const val COL_MEDICINA_RECORDATORIO_ACTIVO = "recordatorio_activo" // 0 o 1
+
+        // agua
+        const val COL_AGUA_TOTAL = "cantidad_total"
+        const val COL_AGUA_META = "meta_diaria"
 
         @Volatile
         private var instancia: DatabaseHelper? = null
@@ -118,6 +123,17 @@ class DatabaseHelper(context: Context) :
             )
             """.trimIndent()
         )
+
+        db.execSQL(
+            """
+            CREATE TABLE $TABLE_AGUA (
+                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_FECHA TEXT NOT NULL,
+                $COL_AGUA_TOTAL REAL NOT NULL,
+                $COL_AGUA_META REAL NOT NULL
+            )
+            """.trimIndent()
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -135,6 +151,16 @@ class DatabaseHelper(context: Context) :
             db.execSQL("ALTER TABLE $TABLE_GLUCOSA ADD COLUMN $COL_GLUCOSA_NOTAS TEXT")
             db.execSQL("ALTER TABLE $TABLE_PRESION ADD COLUMN $COL_PRESION_PULSO INTEGER")
             db.execSQL("ALTER TABLE $TABLE_PRESION ADD COLUMN $COL_PRESION_BRAZO TEXT")
+            db.execSQL(
+                """
+                CREATE TABLE $TABLE_AGUA (
+                    $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    $COL_FECHA TEXT NOT NULL,
+                    $COL_AGUA_TOTAL REAL NOT NULL,
+                    $COL_AGUA_META REAL NOT NULL
+                )
+                """.trimIndent()
+            )
         }
     }
 
@@ -154,8 +180,10 @@ class DatabaseHelper(context: Context) :
         db.execSQL("DELETE FROM $TABLE_PRESION")
         // DELETE FROM medicina
         db.execSQL("DELETE FROM $TABLE_MEDICINA")
+        // DELETE FROM agua
+        db.execSQL("DELETE FROM $TABLE_AGUA")
         // Reinicia los contadores autoincrementales
-        db.execSQL("DELETE FROM sqlite_sequence WHERE name IN ('$TABLE_PESO', '$TABLE_GLUCOSA', '$TABLE_PRESION', '$TABLE_MEDICINA')")
+        db.execSQL("DELETE FROM sqlite_sequence WHERE name IN ('$TABLE_PESO', '$TABLE_GLUCOSA', '$TABLE_PRESION', '$TABLE_MEDICINA', '$TABLE_AGUA')")
     }
 
     // ===================================================================================
@@ -434,6 +462,47 @@ class DatabaseHelper(context: Context) :
         return db.delete(TABLE_MEDICINA, "$COL_ID = ?", arrayOf(id.toString()))
     }
 
+    // ===================================================================================
+    // AGUA
+    // ===================================================================================
+
+    fun insertarAgua(fecha: String, total: Float, meta: Float): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_FECHA, fecha)
+            put(COL_AGUA_TOTAL, total)
+            put(COL_AGUA_META, meta)
+        }
+        return db.insert(TABLE_AGUA, null, values)
+    }
+
+    fun obtenerHistorialAgua(): List<RegistroAgua> {
+        val lista = mutableListOf<RegistroAgua>()
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT $COL_ID, $COL_FECHA, $COL_AGUA_TOTAL, $COL_AGUA_META " +
+                "FROM $TABLE_AGUA ORDER BY $COL_ID ASC",
+            null
+        )
+        cursor.use {
+            while (it.moveToNext()) {
+                lista.add(
+                    RegistroAgua(
+                        id = it.getInt(it.getColumnIndexOrThrow(COL_ID)),
+                        fecha = it.getString(it.getColumnIndexOrThrow(COL_FECHA)),
+                        cantidadTotal = it.getFloat(it.getColumnIndexOrThrow(COL_AGUA_TOTAL)),
+                        metaDiaria = it.getFloat(it.getColumnIndexOrThrow(COL_AGUA_META))
+                    )
+                )
+            }
+        }
+        return lista
+    }
+
+    fun eliminarAgua(id: Int): Int {
+        val db = writableDatabase
+        return db.delete(TABLE_AGUA, "$COL_ID = ?", arrayOf(id.toString()))
+    }
 }
 
 // =======================================================================================
@@ -473,4 +542,11 @@ data class RegistroMedicina(
     val frecuencia: String,
     val horaRecordatorio: String? = null, // "HH:mm" o null si no tiene recordatorio
     val recordatorioActivo: Boolean = false
+)
+
+data class RegistroAgua(
+    val id: Int = 0,
+    val fecha: String,
+    val cantidadTotal: Float,
+    val metaDiaria: Float
 )

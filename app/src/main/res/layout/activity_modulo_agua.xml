@@ -170,9 +170,9 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Configuration Card -->
+        <!-- Custom Amount & History Card -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardConfig"
+            android:id="@+id/cardCustom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -192,44 +192,56 @@
                 android:padding="24dp">
 
                 <TextView
-                    android:id="@+id/tvConfigLabel"
+                    android:id="@+id/tvCustomLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Configuración"
+                    android:text="Cantidad Personalizada"
                     android:textColor="#0F172A"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <RadioGroup
-                    android:id="@+id/rgGender"
+                <LinearLayout
+                    android:id="@+id/llCustomInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:orientation="horizontal"
-                    android:weightSum="2"
-                    app:layout_constraintTop_toBottomOf="@id/tvConfigLabel">
+                    app:layout_constraintTop_toBottomOf="@id/tvCustomLabel">
 
-                    <RadioButton
-                        android:id="@+id/rbMujer"
+                    <EditText
+                        android:id="@+id/etCustomWater"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
                         android:layout_weight="1"
-                        android:buttonTint="#0284C7"
-                        android:checked="true"
-                        android:text="Mujer"
-                        android:textColor="#334155" />
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/rounded_edittext"
+                        android:hint="ml"
+                        android:inputType="number"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
 
-                    <RadioButton
-                        android:id="@+id/rbHombre"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:buttonTint="#0284C7"
-                        android:text="Hombre"
-                        android:textColor="#334155" />
-                </RadioGroup>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddCustom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:text="Agregar"
+                        app:backgroundTint="#0284C7"
+                        app:cornerRadius="12dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerHistorialAgua"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Ver Historial"
+                    android:textColor="#0284C7"
+                    app:strokeColor="#0284C7"
+                    app:cornerRadius="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/llCustomInput" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

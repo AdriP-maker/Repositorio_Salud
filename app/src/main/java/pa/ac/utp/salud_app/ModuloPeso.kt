@@ -22,12 +22,14 @@ import java.util.Locale
 class ModuloPeso : AppCompatActivity() {
 
     private lateinit var dbHelper: DatabaseHelper
+    private lateinit var sesionManager: SesionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modulo_peso)
 
         dbHelper = DatabaseHelper.getInstance(this)
+        sesionManager = SesionManager(this)
 
         val etEdad = findViewById<EditText>(R.id.etEdad)
         val etPeso = findViewById<EditText>(R.id.etPeso)
@@ -45,14 +47,39 @@ class ModuloPeso : AppCompatActivity() {
         
         val lineChartPeso = findViewById<LineChart>(R.id.lineChartPeso)
 
+        fun updatePesoVisual() {
+            val isLbs = swPesoUnit.isChecked
+            val pesoKg = sesionManager.obtenerPeso()
+            if (isLbs) {
+                etPeso.setText(String.format(java.util.Locale.US, "%.1f", pesoKg / 0.453592f))
+            } else {
+                etPeso.setText(String.format(java.util.Locale.US, "%.1f", pesoKg))
+            }
+        }
+
+        fun updateAlturaVisual() {
+            val isIn = swEstaturaUnit.isChecked
+            val alturaCm = sesionManager.obtenerAltura()
+            if (isIn) {
+                etAltura.setText(String.format(java.util.Locale.US, "%.1f", alturaCm / 2.54f))
+            } else {
+                etAltura.setText(String.format(java.util.Locale.US, "%.1f", alturaCm))
+            }
+        }
+
+        // Pre-cargar datos desde SesionManager
+        etEdad.setText(sesionManager.obtenerEdad().toString())
+        updatePesoVisual()
+        updateAlturaVisual()
+
         swPesoUnit.setOnCheckedChangeListener { _, isChecked ->
             etPeso.hint = if (isChecked) "Peso (Lb)" else "Peso (kg)"
-            etPeso.text.clear()
+            updatePesoVisual()
         }
 
         swEstaturaUnit.setOnCheckedChangeListener { _, isChecked ->
             etAltura.hint = if (isChecked) "Altura (in)" else "Altura (cm)"
-            etAltura.text.clear()
+            updateAlturaVisual()
         }
 
         val btnVerHistorial = findViewById<TextView>(R.id.btnVerHistorial)
@@ -118,11 +145,9 @@ class ModuloPeso : AppCompatActivity() {
             val pesoIdeal = 22 * (estaturaM * estaturaM)
 
             // Extra: % de grasa corporal estimado (fórmula de Deurenberg).
-            // Nota: esta versión de la fórmula es para hombres (constante -16.2);
-            // para mujeres la constante correcta sería -5.4.
-            // Se acota a un rango fisiológicamente posible para evitar resultados
-            // negativos o absurdos en personas muy jóvenes/delgadas.
-            val grasaCorporal = ((1.20 * imc) + (0.23 * edad) - 16.2).coerceIn(3.0, 60.0)
+            val genero = sesionManager.obtenerGenero()
+            val constanteGenero = if (genero == "Hombre") -16.2 else -5.4
+            val grasaCorporal = ((1.20 * imc) + (0.23 * edad) + constanteGenero).coerceIn(3.0, 60.0)
 
             val categoria = categorizarIMC(imc)
             val diferenciaPeso = pesoKg - pesoIdeal
@@ -133,6 +158,15 @@ class ModuloPeso : AppCompatActivity() {
             tvGrasa.text = String.format("Grasa corporal estimada: %.1f%%", grasaCorporal)
             tvConsejoPeso.text = generarConsejoPeso(categoria, diferenciaPeso)
             
+            // Actualizar la sesión global con el nuevo peso para que el Módulo de Agua lo refleje
+            sesionManager.actualizarPerfil(
+                nombre = sesionManager.obtenerNombreUsuario(),
+                genero = genero,
+                edad = edad,
+                peso = pesoKg.toFloat(),
+                altura = estaturaCm.toFloat()
+            )
+
             // Mostrar resultados
             cardResult.visibility = View.VISIBLE
 

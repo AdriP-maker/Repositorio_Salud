@@ -48,10 +48,12 @@
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_edittext"
         android:hint="Nombre de usuario"
+        android:textColorHint="#94A3B8"
+        android:textColor="#0F172A"
         android:inputType="textPersonName"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -60,6 +62,126 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSubBienvenida" />
+
+    <EditText
+        android:id="@+id/etEdadLogin"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="Edad (años)"
+        android:textColorHint="#94A3B8"
+        android:textColor="#0F172A"
+        android:inputType="number"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etNombreUsuario" />
+
+    <LinearLayout
+        android:id="@+id/llSwitchesLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etEdadLogin">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swPesoUnitLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Libras"
+            android:textColor="#64748B" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swEstaturaUnitLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Pulgadas"
+            android:textColor="#64748B" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llMedidasLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llSwitchesLogin">
+
+        <EditText
+            android:id="@+id/etPesoLogin"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Peso (kg)"
+            android:textColorHint="#94A3B8"
+            android:textColor="#0F172A"
+            android:inputType="numberDecimal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+        <EditText
+            android:id="@+id/etAlturaLogin"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Altura (cm)"
+            android:textColorHint="#94A3B8"
+            android:textColor="#0F172A"
+            android:inputType="numberDecimal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/rgGeneroLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llMedidasLogin">
+
+        <RadioButton
+            android:id="@+id/rbMujerLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Mujer"
+            android:textColor="#0F172A"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/rbHombreLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#0F172A"
+            android:text="Hombre" />
+    </RadioGroup>
 
     <Button
         android:id="@+id/btnIniciarSesion"
@@ -75,7 +197,7 @@
         app:cornerRadius="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etNombreUsuario" />
+        app:layout_constraintTop_toBottomOf="@id/rgGeneroLogin" />
 
     <TextView
         android:id="@+id/tvAyudaLogin"
